@@ -62,9 +62,6 @@ modify lines 16 and 17 of `./SRC/types.h`
 Basic Testing
 -------------------------------------------------------------
 // Then to test
-- "make test"
-OR to see more outputs from python script
-- "ctest -VV"
 
 4 -----------------------------------------------------------
 Advanced Debug and Tools

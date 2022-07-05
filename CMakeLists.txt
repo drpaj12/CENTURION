@@ -75,7 +75,7 @@ add_executable(centurion ${SOURCES} ${HEADERS})
 # Libraries needed
 find_library(ARGPARSE NAMES libargparse argparse HINTS LIBS/libargparse PATH_SUFFIXES libargparse)
 target_link_libraries(centurion ${ARGPARSE})
-find_library(LIBXML2 NAMES libxml2 xml2 HINTS /home/robot/SIMULATION_WORK/CENTURION/LIBS/libxml2-2.9.9/LOCAL/lib PATH_SUFFIXES libxml2)
+find_library(LIBXML2 NAMES libxml2 xml2 HINTS LIBS/libxml2-2.9.9/LOCAL/lib PATH_SUFFIXES libxml2)
 target_link_libraries(centurion ${LIBXML2})
 target_link_libraries(centurion m)
 
