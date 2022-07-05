@@ -1,0 +1,12 @@
+*.swp
+
+SANDBOX/*.out
+Makefile
+centurion
+ssh_key_github.pub
+
+LIBS/libxml2-2.9.9*
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
