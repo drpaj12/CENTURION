@@ -9,6 +9,7 @@
 		<real_size_x_in_m>2.00</real_size_x_in_m>
 		<real_size_y_in_m>1.30</real_size_y_in_m>
 		<sim_grid_size_in_m>0.01</sim_grid_size_in_m>
+		<sim_time_s>10</sim_time_s>
 		<sim_time_computation_epoch_s>0.5</sim_time_computation_epoch_s>
 		<boundary_walls>FALSE</boundary_walls>
 		<objects>
@@ -40,7 +41,7 @@
 			<num_agents>1</num_agents>
 			<!-- control must always be included and is last item in agent group -->
 			<control>
-				<control_algorithm>overlord</control_algorithm>	
+				<control_algorithm>OVERLORD</control_algorithm>	
 			</control>
 		</agent_group>
 		<agent_group>
@@ -56,8 +57,14 @@
 					<x>0.7</x><y>0.7</y><angle>0</angle>
 				</list>
 			</initialization_of_agents>
-			<!-- robots are currently spheres -->
-			<shape>0.10</shape>
+			<!-- robots are currently spheres, x1 and y1 don't matter -->
+			<object>
+				<sphere>
+					<x1>0.5</x1>
+					<y1>0.23</y1>
+					<radius>0.23</radius>
+				</sphere>
+			</object>
 			<sensors>
 				<num_sensors>1</num_sensors>
 				<sensor>
@@ -78,7 +85,7 @@
 			</actuators>
 			<!-- control must always be included and is last item in agent group -->
 			<control>
-				<control_algorithm>basic_avoid_ICRA</control_algorithm>	
+				<control_algorithm>BASIC_AVOID_ICRA</control_algorithm>	
 				<!--<control_algorithm>boids</control_algorithm>-->
 				<!--<goals>
 					<waypoint><x>1.1</x><y>1.2</y></waypoint>

@@ -34,6 +34,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "argparse.hpp"
 #include "read_xml_config_file.h"
+#include "simulation.h"
 
 /* globals */
 global_args_t global_args;
@@ -48,7 +49,7 @@ FILE *f_log_out;
 FILE *f_debug_out;
 
 /* prototypes */
-void get_options(int argc, char** argv) ;
+void get_options(int argc, char** argv);
 
 int main(int argc, char **argv)
 {
@@ -78,6 +79,12 @@ int main(int argc, char **argv)
 	/* ---- BASIC Sequential GA Executions ---- */
 	if (strcmp(sim_system.simulation_type, "discrete") == 0)
 	{
+		printf("Doing Discrete Simulation\n");
+		/* initialize everything for simulation */
+		setup_simulation();
+
+		/* run the simulation loop */
+		simulation_loop();
 	}
 	else
 	{

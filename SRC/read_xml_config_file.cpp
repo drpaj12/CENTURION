@@ -32,10 +32,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "read_xml_config_file.h"
 #include "utils.h"
+#include "robot_control.h"
 
 // libxml includes
 #include <libxml/xmlmemory.h> //#include <libxml/xmlmemory.h>
 #include <libxml/parser.h> //#include <libxml/parser.h>
+
+void read_xml_object(objects_t *object, xmlNodePtr shape_xmlptr, xmlDocPtr doc);
 
 /*-------------------------------------------------------------------------
  * (function: read_config_file)
@@ -125,16 +128,16 @@ void read_config_file(char *config_file_name)
 					environment.real_size_y_in_m = atof((char*)string_data);
 					xmlFree(string_data);
 				}
-				else if ((!xmlStrcmp(environment_params_xmlptr->name, (const xmlChar *)"sim_grid_size_in_m")))
-				{
-					string_data = xmlNodeListGetString(doc, environment_params_xmlptr->xmlChildrenNode, 1);
-					environment.sim_grid_size_in_m = atof((char*)string_data);
-					xmlFree(string_data);
-				}
 				else if ((!xmlStrcmp(environment_params_xmlptr->name, (const xmlChar *)"sim_time_computation_epoch_s")))
 				{
 					string_data = xmlNodeListGetString(doc, environment_params_xmlptr->xmlChildrenNode, 1);
 					environment.sim_time_computation_epoch_s = atof((char*)string_data);
+					xmlFree(string_data);
+				}
+				else if ((!xmlStrcmp(environment_params_xmlptr->name, (const xmlChar *)"sim_time_s")))
+				{
+					string_data = xmlNodeListGetString(doc, environment_params_xmlptr->xmlChildrenNode, 1);
+					environment.sim_time_s = atof((char*)string_data);
 					xmlFree(string_data);
 				}
 				else if ((!xmlStrcmp(environment_params_xmlptr->name, (const xmlChar *)"boundary_walls")))
@@ -172,102 +175,7 @@ void read_config_file(char *config_file_name)
 						}
 						else if ((!xmlStrcmp(objects_xmlptr->name, (const xmlChar *)"object")))
 						{
-							xmlNodePtr shape_xmlptr = objects_xmlptr->xmlChildrenNode;
-							environment.objects[objects_idx]->radius = 0.0;
-							environment.objects[objects_idx]->x1 = 0.0;
-							environment.objects[objects_idx]->y1 = 0.0;
-							environment.objects[objects_idx]->x2 = 0.0;
-							environment.objects[objects_idx]->y2 = 0.0;
-							environment.objects[objects_idx]->x3 = 0.0;
-							environment.objects[objects_idx]->y3 = 0.0;
-							environment.objects[objects_idx]->x4 = 0.0;
-							environment.objects[objects_idx]->y4 = 0.0;
-
-							if ((!xmlStrcmp(shape_xmlptr->name, (const xmlChar *)"sphere")))
-							{
-								xmlNodePtr shape_details_xmlptr = shape_xmlptr->xmlChildrenNode;
-								while (shape_details_xmlptr != NULL)
-								{
-			                                                environment.objects[objects_idx]->type = SPHERE;
-									if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->x1 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->y1 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"radius")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->radius = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									shape_details_xmlptr = shape_details_xmlptr->next;
-								}
-							}
-							else if ((!xmlStrcmp(shape_xmlptr->name, (const xmlChar *)"quadrilateral")))
-							{
-								xmlNodePtr shape_details_xmlptr = shape_xmlptr->xmlChildrenNode;
-								while (shape_details_xmlptr != NULL)
-								{
-			                                                environment.objects[objects_idx]->type = QUADRILATERAL;
-									if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->x1 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->y1 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x1")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->x2 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y1")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->y2 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x2")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->x3 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y2")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->y3 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x3")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->x4 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y3")))
-			                                                {
-			                                                        string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
-			                                                        environment.objects[objects_idx]->y4 = atof((char*)string_data);
-			                                                        xmlFree(string_data);
-									}
-									shape_details_xmlptr = shape_details_xmlptr->next;
-								}
-							}
+							read_xml_object(environment.objects[objects_idx], objects_xmlptr->xmlChildrenNode, doc);
 							objects_idx ++;
 						}
 
@@ -372,11 +280,10 @@ void read_config_file(char *config_file_name)
 								initialization_xmlptr = initialization_xmlptr->next;
 							}
 			                        }
-						else if ((!xmlStrcmp(agent_group_xmlptr->name, (const xmlChar *)"shape")))
+						else if ((!xmlStrcmp(agent_group_xmlptr->name, (const xmlChar *)"object")))
 						{
-							string_data = xmlNodeListGetString(doc, agent_group_xmlptr->xmlChildrenNode, 1);
-							agent_groups.agent_group[agent_group_idx]->radius = atof((char*)string_data);
-							xmlFree(string_data);
+							agent_groups.agent_group[agent_group_idx]->shape = (objects_t*)malloc(sizeof(objects_t));	
+							read_xml_object(agent_groups.agent_group[agent_group_idx]->shape, agent_group_xmlptr->xmlChildrenNode, doc);
 						}
 						else if ((!xmlStrcmp(agent_group_xmlptr->name, (const xmlChar *)"sensors")))
 						{
@@ -498,7 +405,9 @@ void read_config_file(char *config_file_name)
 								if ((!xmlStrcmp(control_xmlptr->name, (const xmlChar *)"control_algorithm")))
 		                                                {
 		                                                        string_data = xmlNodeListGetString(doc, control_xmlptr->xmlChildrenNode, 1);
-		                                                        agent_groups.agent_group[agent_group_idx]->control_algorithm = (char*)string_data;
+									/* hookup the control function */
+									setup_function_for_control(agent_groups.agent_group[agent_group_idx], (char*)string_data);
+									xmlFree(string_data);
 								}
 								control_xmlptr = control_xmlptr->next;
 							}
@@ -528,6 +437,109 @@ void read_config_file(char *config_file_name)
 	
 	xmlFreeDoc(doc);
 	return;
+}
+
+/*-------------------------------------------------------------------------
+ * (function: read_xml_object)
+ *-----------------------------------------------------------------------*/
+void read_xml_object(objects_t *object, xmlNodePtr shape_xmlptr, xmlDocPtr doc)
+{
+	xmlChar *string_data;
+
+	object->radius = 0.0;
+	object->x1 = 0.0;
+	object->y1 = 0.0;
+	object->x2 = 0.0;
+	object->y2 = 0.0;
+	object->x3 = 0.0;
+	object->y3 = 0.0;
+	object->x4 = 0.0;
+	object->y4 = 0.0;
+
+	if ((!xmlStrcmp(shape_xmlptr->name, (const xmlChar *)"sphere")))
+	{
+		xmlNodePtr shape_details_xmlptr = shape_xmlptr->xmlChildrenNode;
+		while (shape_details_xmlptr != NULL)
+		{
+			object->type = SPHERE;
+			if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x")))
+                       	{
+                       		string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+                               	object->x1 = atof((char*)string_data);
+                               	xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->y1 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"radius")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->radius = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			shape_details_xmlptr = shape_details_xmlptr->next;
+		}
+	}
+	else if ((!xmlStrcmp(shape_xmlptr->name, (const xmlChar *)"quadrilateral")))
+	{
+		xmlNodePtr shape_details_xmlptr = shape_xmlptr->xmlChildrenNode;
+		while (shape_details_xmlptr != NULL)
+		{
+			object->type = QUADRILATERAL;
+			if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->x1 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->y1 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x1")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->x2 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y1")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->y2 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x2")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->x3 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y2")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->y3 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"x3")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->x4 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			else if ((!xmlStrcmp(shape_details_xmlptr->name, (const xmlChar *)"y3")))
+			{
+				string_data = xmlNodeListGetString(doc, shape_details_xmlptr->xmlChildrenNode, 1);
+				object->y4 = atof((char*)string_data);
+				xmlFree(string_data);
+			}
+			shape_details_xmlptr = shape_details_xmlptr->next;
+		}
+	}
 }
 
 /*-------------------------------------------------------------------------
