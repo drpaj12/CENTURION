@@ -24,17 +24,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef ROBOT_CONTROL_H
-#define ROBOT_CONTROL_H
+#ifndef ACTUATORS_H
+#define ACTUATORS_H
 
 #include "types.h"
 
-extern void run_agent_control(
+void run_actuator(
+		actuator_t *actuator,
 		agent_t *agent,
+		act_inputs_t *inputs,
 		double current_time
 	);
-
-extern void setup_function_for_control(agent_group_t *agent_group, char *function_name);
+void setup_function_for_actuator(actuator_t *actuator, char *function_name);
 
 #endif
 

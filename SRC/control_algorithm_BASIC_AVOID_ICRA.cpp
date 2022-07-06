@@ -34,11 +34,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 /* globals */
 
 /*-------------------------------------------------------------------------
- * (function: OVERLORD_control_algorithm)
+ * (function: BASIC_AVOID_ICRA_control_algorithm)
  *-----------------------------------------------------------------------*/
-void OVERLORD_control_algorithm(agent_t *agent, double current_time) 
+void control_algorithm_BASIC_AVOID_ICRA(agent_t *agent, double current_time) 
 {
-	printf("OVERLORD_control_algorithm_called\n");
+	printf("BASIC_AVOID_ICRA_control_algorithm called\n");
 	return;
 }
 

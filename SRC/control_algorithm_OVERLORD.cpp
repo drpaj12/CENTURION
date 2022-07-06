@@ -23,18 +23,22 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-
-#ifndef ROBOT_CONTROL_H
-#define ROBOT_CONTROL_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "types.h"
+#include "globals.h"
+#include "utils.h"
 
-extern void run_agent_control(
-		agent_t *agent,
-		double current_time
-	);
+/* globals */
 
-extern void setup_function_for_control(agent_group_t *agent_group, char *function_name);
-
-#endif
+/*-------------------------------------------------------------------------
+ * (function: OVERLORD_control_algorithm)
+ *-----------------------------------------------------------------------*/
+void control_algorithm_OVERLORD(agent_t *agent, double current_time) 
+{
+	printf("OVERLORD_control_algorithm_called\n");
+	return;
+}
 

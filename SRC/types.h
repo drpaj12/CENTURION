@@ -76,31 +76,29 @@ struct sim_obj_t
 };
 
 /* different types of sensor */
-enum sensor_type {ULTRASONIC, IR};
 struct sensor_t_t 
 {
-	sensor_type type;
 	double angle; // <!-- assume 0 = 0 degrees facing forward of robot -->
 	double sim_time_computation_epoch_s; // how fast the sensor reads
+	double time_of_last_read_s;
 
-	double (*fptr_sensor)(agent_t *agent);
+	/* the function that returns void * data for what sensor sees */
+	void* (*fptr_sensor)(sensor_t *sensor, agent_t *agent, double current_time);
 };
 
 /* inputs to an actuator */
 struct act_inputs_t_t 
 {
-	double left_v;
-	double right_v;
+	double left;
+	double right;
 };
 	
 /* different types of actuators */
-enum actuator_type {TWO_WHEELS};
 struct actuator_t_t 
 {
-	actuator_type type;
 	double sim_time_computation_epoch_s; // how fast the sensor reads
 
-	void (*fptr_actuator)(agent_t *agent, act_inputs_t *values);
+	void (*fptr_actuator)(actuator_t *actuator, agent_t *agent, act_inputs_t *values, double current_time);
 };
 
 /* different types of agent */
@@ -114,6 +112,11 @@ struct agent_t_t
 	double angle; // assuming in degrees where 0 degrees is North
 	
 	void *general_memory;
+
+	int CURRENT_STATE;
+	double time_in_state;
+	double last_time;
+	
 
 	/* personal goals */
 };
@@ -150,7 +153,7 @@ struct agent_group_t_t
 	actuator_t **actuators;
 
 	/* function pointer of control algorithm */
-	void (*control_algorithm)(agent_t *agent, double current_time);
+	void (*fptr_control_algorithm)(agent_t *agent, double current_time);
 
 	// goals not here 
 };
@@ -176,8 +179,6 @@ struct environment_t_t
 {
 	double real_size_x_in_m;
 	double real_size_y_in_m;
-	double sim_grid_size_x_in_m;
-	double sim_grid_size_y_in_m;
 	double sim_time_s; 
 	double sim_time_computation_epoch_s; // assume the use has set this time to the smallest and all other sim_time are divisible by
 	short boundary_walls;

@@ -68,7 +68,9 @@
 			<sensors>
 				<num_sensors>1</num_sensors>
 				<sensor>
-					<type>ultrasonic</type>
+					<type>IDEAL_BEAM</type>
+					<!--<type>ULTRASONIC</type>-->
+					<!--<type>IR</type>-->
 					<!-- assume 0 = 0 degrees facing forward -->
 					<direction_on_agent>0</direction_on_agent>
 					<!-- this (sim_time...) needs to be the last parameter -->
@@ -78,15 +80,17 @@
 			<actuators>
 				<num_actuators>1</num_actuators>
 				<actuator>
-					<type>two_wheel</type>
+					<type>IDEAL_TWO_WHEEL</type>
+					<!--<type>TWO_WHEEL</type>-->
 					<!-- this needs to be the last parameter -->
 					<sim_time_computation_epoch_s>1</sim_time_computation_epoch_s>
 				</actuator>
 			</actuators>
 			<!-- control must always be included and is last item in agent group -->
 			<control>
-				<control_algorithm>BASIC_AVOID_ICRA</control_algorithm>	
-				<!--<control_algorithm>boids</control_algorithm>-->
+				<!--<control_algorithm>BASIC_AVOID_ICRA</control_algorithm>-->
+				<control_algorithm>SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE</control_algorithm>	
+				<!--<control_algorithm>BOIDS</control_algorithm>-->
 				<!--<goals>
 					<waypoint><x>1.1</x><y>1.2</y></waypoint>
 					<crash>FALSE</crash>

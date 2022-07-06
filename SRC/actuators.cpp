@@ -34,56 +34,51 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "control_sensors_actuators.h"
 
 /* globals */
-int num_control_algorithm_names = 4;
-const char *control_algorithm_name[] = { 
-                                        "OVERLORD", 
-                                        "BASIC_AVOID_ICRA",
-					"BOIDS",
-				        "SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE"	
+int num_actuator_names = 2; // number of strings below and in enum
+const char *actuator_names[] = { 
+                                        "IDEAL_TWO_WHEEL", 
+                                        "TWO_WHEEL"
                                         };
-
-enum control_algorithm_type {OVERLORD = 0, BASIC_AVOID_ICRA = 1, BOIDS = 2, SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE, NO_CONTROL};
+enum actuator_types {IDEAL_TWO_WHEEL = 0, TWO_WHEEL = 1,  NO_SENSOR};
 
 /*-------------------------------------------------------------------------
- * (function: run_agent_control)
+ * (function: run_actuator)
  *-----------------------------------------------------------------------*/
-void run_agent_control(
+void run_actuator(
+		actuator_t *actuator,
 		agent_t *agent,
+		act_inputs_t *inputs,
 		double current_time
-	) 
+	)
 {
 	/* call the control function of the current simulated robot */
-	(*(agent->agent_group->fptr_control_algorithm))(agent, current_time);	
+	(*(actuator->fptr_actuator))(actuator, agent, inputs, current_time);	
 }
 
 /*-------------------------------------------------------------------------
- * (function: setup_function_for_control)
+ * (function: setup_function_for_actuator)
  *-----------------------------------------------------------------------*/
-void setup_function_for_control(agent_group_t *agent_group, char *function_name)
+void setup_function_for_actuator(actuator_t *actuator, char *function_name)
 {
-	int control_function_id;
+	int actuator_function_id;
 	
-        control_function_id = return_string_in_list(function_name, (char**)control_algorithm_name, num_control_algorithm_names);
+        actuator_function_id = return_string_in_list(function_name, (char**)actuator_names, num_actuator_names);
 
-        switch(control_function_id)
+        switch(actuator_function_id)
         {
                 /* PERMUTATION ENCODINGS */
-                case OVERLORD:
-                        agent_group->fptr_control_algorithm = control_algorithm_OVERLORD;
+                case IDEAL_TWO_WHEEL:
+                        actuator->fptr_actuator = actuator_function_IDEAL_TWO_WHEEL;
 			break;
-                case BASIC_AVOID_ICRA:
-                        agent_group->fptr_control_algorithm = control_algorithm_BASIC_AVOID_ICRA;
-			break;
-                case BOIDS:
-                        agent_group->fptr_control_algorithm = NULL;
-			oassert(FALSE);
-			break;
-                case SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE:
-                        agent_group->fptr_control_algorithm = control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE;
+                case TWO_WHEEL:
+                        actuator->fptr_actuator = actuator_function_TWO_WHEEL;
 			break;
 		default:
-			printf("EXIT - Agent with no control algorithm\n");
+			printf("EXIT - Agent with no actuator algorithm\n");
 			exit(-1);
 			break;
 	}
 }
+
+
+

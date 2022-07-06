@@ -23,22 +23,18 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+
+#ifndef SENSORS_H
+#define SENSORS_H
 
 #include "types.h"
-#include "globals.h"
-#include "utils.h"
 
-/* globals */
+void* run_sensor(
+		sensor_t *sensor,
+		agent_t *agent,
+		double current_time
+	);
+void setup_function_for_sensor(sensor_t *sensor, char *function_name);
 
-/*-------------------------------------------------------------------------
- * (function: BASIC_AVOID_ICRA_control_algorithm)
- *-----------------------------------------------------------------------*/
-void BASIC_AVOID_ICRA_control_algorithm(agent_t *agent, double current_time) 
-{
-	printf("BASIC_AVOID_ICRA_control_algorithm called\n");
-	return;
-}
+#endif
 

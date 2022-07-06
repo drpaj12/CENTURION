@@ -33,6 +33,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "read_xml_config_file.h"
 #include "utils.h"
 #include "robot_control.h"
+#include "sensors.h"
+#include "actuators.h"
 
 // libxml includes
 #include <libxml/xmlmemory.h> //#include <libxml/xmlmemory.h>
@@ -226,6 +228,8 @@ void read_config_file(char *config_file_name)
 								agent_groups.agent_group[agent_group_idx]->agents[i] = (agent_t*)malloc(sizeof(agent_t));
 								/* setup the back pointer so we can get from an individual to it's groups data */
 								agent_groups.agent_group[agent_group_idx]->agents[i]->agent_group = agent_groups.agent_group[agent_group_idx];
+								/* all agents start in state 0 */
+								agent_groups.agent_group[agent_group_idx]->agents[i]->CURRENT_STATE = 0;
 							}
 						}
 						else if ((!xmlStrcmp(agent_group_xmlptr->name, (const xmlChar *)"initialization_of_agents")))
@@ -301,6 +305,8 @@ void read_config_file(char *config_file_name)
 									for (i = 0; i < agent_groups.agent_group[agent_group_idx]->num_sensors; i++)
 									{
 										agent_groups.agent_group[agent_group_idx]->sensors[i] = (sensor_t*)malloc(sizeof(sensor_t));
+										/* initialize sensor */
+										agent_groups.agent_group[agent_group_idx]->sensors[i]->time_of_last_read_s = 0;
 									}
 									sensor_idx = 0;
 
@@ -314,14 +320,10 @@ void read_config_file(char *config_file_name)
 		                                                                if ((!xmlStrcmp(sensor_xmlptr->name, (const xmlChar *)"type")))
 		                                                                {
 		                                                                        string_data = xmlNodeListGetString(doc, sensor_xmlptr->xmlChildrenNode, 1);
-											if (strcmp((char*)string_data, "ir") == 0)
-											{
-		                                                                        	agent_groups.agent_group[agent_group_idx]->sensors[sensor_idx]->type = IR;
-											}
-											else if (strcmp((char*)string_data, "ultrasonic") == 0)
-											{
-		                                                                        	agent_groups.agent_group[agent_group_idx]->sensors[sensor_idx]->type = ULTRASONIC;
-											}
+
+											/* setup function call */
+											setup_function_for_sensor(agent_groups.agent_group[agent_group_idx]->sensors[sensor_idx], (char*)string_data);
+
 		                                                                        xmlFree(string_data);
 		                                                                }
 		                                                                else if ((!xmlStrcmp(sensor_xmlptr->name, (const xmlChar *)"direction_on_agent")))
@@ -375,11 +377,8 @@ void read_config_file(char *config_file_name)
 		                                                                if ((!xmlStrcmp(actuator_xmlptr->name, (const xmlChar *)"type")))
 		                                                                {
 		                                                                        string_data = xmlNodeListGetString(doc, actuator_xmlptr->xmlChildrenNode, 1);
-											if (strcmp((char*)string_data, "two_wheel") == 0)
-											{
-		                                                                        	agent_groups.agent_group[agent_group_idx]->actuators[actuator_idx]->type = TWO_WHEELS;
-											}
-		                                                                        xmlFree(string_data);
+											/* setup actuator function */
+											setup_function_for_actuator(agent_groups.agent_group[agent_group_idx]->actuators[actuator_idx], (char*)string_data);
 		                                                                }
 										else if ((!xmlStrcmp(actuator_xmlptr->name, (const xmlChar *)"sim_time_computation_epoch_s")))
 		                                                                {

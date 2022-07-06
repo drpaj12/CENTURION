@@ -23,13 +23,22 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-
-#ifndef OVERLORD_CONTROL_ALGORITHM_H
-#define OVERLORD_CONTROL_ALGORITHM_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "types.h"
+#include "globals.h"
+#include "utils.h"
 
-extern void OVERLORD_control_algorithm( agent_t *agent, double current_time);
+/* globals */
 
-#endif
+/*-------------------------------------------------------------------------
+ * (function: )
+ *-----------------------------------------------------------------------*/
+void* sensor_function_IR(sensor_t *sensor, agent_t *agent, double current_time) 
+{
+	printf("IR called\n");
+	return NULL;
+}
 

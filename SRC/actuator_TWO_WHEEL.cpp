@@ -23,13 +23,21 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-
-#ifndef BASIC_AVOID_ICRA_CONTROL_ALGORITHM_H
-#define BASIC_AVOID_ICRA_CONTROL_ALGORITHM_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "types.h"
+#include "globals.h"
+#include "utils.h"
 
-extern void BASIC_AVOID_ICRA_control_algorithm( agent_t *agent, double current_time);
+/* globals */
 
-#endif
+/*-------------------------------------------------------------------------
+ * (function: )
+ *-----------------------------------------------------------------------*/
+void actuator_function_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act_inputs_t *inputs, double current_time) 
+{
+	printf("TWO WHEEL ACTUATOR called\n");
+}
 

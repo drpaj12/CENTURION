@@ -24,17 +24,30 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef ROBOT_CONTROL_H
-#define ROBOT_CONTROL_H
+#ifndef CONTROL_SENSORS_ACTUATORS_H
+#define CONTROL_SENSORS_ACTUATORS_H
 
 #include "types.h"
 
-extern void run_agent_control(
-		agent_t *agent,
-		double current_time
-	);
+/* CONTROL Algorithms */
+extern void control_algorithm_OVERLORD(agent_t *agent, double current_time);
+extern void control_algorithm_BASIC_AVOID_ICRA(agent_t *agent, double current_time);
+extern void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent, double current_time);
 
-extern void setup_function_for_control(agent_group_t *agent_group, char *function_name);
+/* SENSORS */
+extern void* sensor_function_IDEAL_BEAM(sensor_t *sensor, agent_t *agent, double current_time);
+extern void* sensor_function_ULTRASONIC(sensor_t *sensor, agent_t *agent, double current_time);
+extern void* sensor_function_IR(sensor_t *sensor, agent_t *agent, double current_time);
+
+/* ACTUATORS */
+extern void actuator_function_IDEAL_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act_inputs_t *inputs, double current_time);
+extern void actuator_function_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act_inputs_t *inputs, double current_time);
+
+typedef struct beam_sensor_t_t beam_sensor_t;
+struct beam_sensor_t_t
+{
+	double in_m;
+};
 
 #endif
 

@@ -23,18 +23,32 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
-
-#ifndef ROBOT_CONTROL_H
-#define ROBOT_CONTROL_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "types.h"
+#include "globals.h"
+#include "utils.h"
 
-extern void run_agent_control(
-		agent_t *agent,
-		double current_time
-	);
+/* globals */
 
-extern void setup_function_for_control(agent_group_t *agent_group, char *function_name);
+/*-------------------------------------------------------------------------
+ * (function: )
+ *-----------------------------------------------------------------------*/
+void actuator_function_IDEAL_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act_inputs_t *inputs, double current_time) 
+{
+	printf("IDEAL_TWO WHEEL ACTUATOR called\n");
 
-#endif
+	if (inputs->left == 1 && inputs->right == 1)
+		printf("moving forward\n");
+	else if (inputs->left == 0 && inputs->right == 0)
+		printf("stopped\n");
+	else if (inputs->left == 1 && inputs->right == 0)
+		printf("turning left\n");
+	else if (inputs->left == 0 && inputs->right == 1)
+		printf("turning right\n");
+	else 
+		printf("moving confused\n");
+}
 

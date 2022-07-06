@@ -34,56 +34,54 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "control_sensors_actuators.h"
 
 /* globals */
-int num_control_algorithm_names = 4;
-const char *control_algorithm_name[] = { 
-                                        "OVERLORD", 
-                                        "BASIC_AVOID_ICRA",
-					"BOIDS",
-				        "SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE"	
+int num_sensor_names = 3; // number of strings below and in enum
+const char *sensor_names[] = { 
+                                        "IDEAL_BEAM", 
+                                        "ULTRASONIC",
+                                        "IR" 
                                         };
-
-enum control_algorithm_type {OVERLORD = 0, BASIC_AVOID_ICRA = 1, BOIDS = 2, SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE, NO_CONTROL};
+enum sensor_types {IDEAL_BEAM = 0, ULTRASONIC = 1 , IR = 2, NO_SENSOR};
 
 /*-------------------------------------------------------------------------
- * (function: run_agent_control)
+ * (function: run_sensor)
  *-----------------------------------------------------------------------*/
-void run_agent_control(
+void* run_sensor(
+		sensor_t *sensor,
 		agent_t *agent,
 		double current_time
 	) 
 {
 	/* call the control function of the current simulated robot */
-	(*(agent->agent_group->fptr_control_algorithm))(agent, current_time);	
+	return (*(sensor->fptr_sensor))(sensor, agent, current_time);	
 }
 
 /*-------------------------------------------------------------------------
- * (function: setup_function_for_control)
+ * (function: setup_function_for_sensor)
  *-----------------------------------------------------------------------*/
-void setup_function_for_control(agent_group_t *agent_group, char *function_name)
+void setup_function_for_sensor(sensor_t *sensor, char *function_name)
 {
-	int control_function_id;
+	int sensor_function_id;
 	
-        control_function_id = return_string_in_list(function_name, (char**)control_algorithm_name, num_control_algorithm_names);
+        sensor_function_id = return_string_in_list(function_name, (char**)sensor_names, num_sensor_names);
 
-        switch(control_function_id)
+        switch(sensor_function_id)
         {
                 /* PERMUTATION ENCODINGS */
-                case OVERLORD:
-                        agent_group->fptr_control_algorithm = control_algorithm_OVERLORD;
+                case IDEAL_BEAM:
+                        sensor->fptr_sensor = sensor_function_IDEAL_BEAM;
 			break;
-                case BASIC_AVOID_ICRA:
-                        agent_group->fptr_control_algorithm = control_algorithm_BASIC_AVOID_ICRA;
+                case ULTRASONIC:
+                        sensor->fptr_sensor = sensor_function_ULTRASONIC;
 			break;
-                case BOIDS:
-                        agent_group->fptr_control_algorithm = NULL;
-			oassert(FALSE);
-			break;
-                case SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE:
-                        agent_group->fptr_control_algorithm = control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE;
+                case IR:
+                        sensor->fptr_sensor = sensor_function_IR;
 			break;
 		default:
-			printf("EXIT - Agent with no control algorithm\n");
+			printf("EXIT - Agent with no sensor algorithm\n");
 			exit(-1);
 			break;
 	}
 }
+
+
+

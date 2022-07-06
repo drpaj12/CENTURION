@@ -107,7 +107,7 @@ void simulation_loop()
 			}
 			else if (sim_objects[i]->type == AGENT)
 			{
-				run_agent_control(sim_objects[i]->agent->agent_group->control_algorithm, sim_objects[i]->agent, current_time);
+				run_agent_control(sim_objects[i]->agent, current_time);
 			}
 		}
 
