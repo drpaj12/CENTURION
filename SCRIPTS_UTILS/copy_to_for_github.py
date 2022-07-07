@@ -11,7 +11,8 @@ def run_program(path):
     return True
 
 # Program runs all the programs in the directory
+delete_src_first = 'rm -rf /home/robot/DEVELOPMENT/RESEARCH/SUPERVISION_AND_PROJECTS/PROGRAMS_PROJECTS_DEVELOPMENT/ROBOT_AGENT_SYSTEM/CENTURION_/CENTURION/SRC/*'
+run_program(delete_src_first)
 copy_to = 'cp -r /home/robot/SIMULATION_WORK/CENTURION/* /home/robot/DEVELOPMENT/RESEARCH/SUPERVISION_AND_PROJECTS/PROGRAMS_PROJECTS_DEVELOPMENT/ROBOT_AGENT_SYSTEM/CENTURION_/CENTURION/'
-
 run_program(copy_to)
 

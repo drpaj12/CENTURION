@@ -31,24 +31,112 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "globals.h"
 #include "utils.h"
 
+#include "robot_movement.h"
+
 /* globals */
+
+enum movement {FORWARD, BACKWARDS, RIGHT, LEFT, STOPPED};
+
+typedef struct actuator_state_t_t actuator_state_t;
+struct actuator_state_t_t
+{
+	movement move_type;
+	double last_instruction_time_start;
+	double last_instruction_time_end;
+	double m_per_epoch;
+	double angle_per_epoch;
+};
+
+// 1 cm / second
+// Means 5 cm takes 5 seconds
+#define VELOCITY_IN_M_PER_S 0.01 
+// 10 degrees / second IN Radians
+// Means 90degrees takes 9 seconds
+#define TURN_IN_DEGREES_PER_S 0.1745329352 
 
 /*-------------------------------------------------------------------------
  * (function: )
  *-----------------------------------------------------------------------*/
 void actuator_function_IDEAL_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act_inputs_t *inputs, double current_time) 
 {
+	actuator_state_t* actuator_state;
+
 	printf("IDEAL_TWO WHEEL ACTUATOR called\n");
 
-	if (inputs->left == 1 && inputs->right == 1)
-		printf("moving forward\n");
-	else if (inputs->left == 0 && inputs->right == 0)
-		printf("stopped\n");
-	else if (inputs->left == 1 && inputs->right == 0)
-		printf("turning left\n");
-	else if (inputs->left == 0 && inputs->right == 1)
-		printf("turning right\n");
-	else 
-		printf("moving confused\n");
-}
+	if (actuator->initialized == FALSE)
+	{	
+		actuator->initialized = TRUE;
 
+		actuator_state = (actuator_state_t*)malloc(sizeof(actuator_state_t));
+		/* velocity is m/s and simulator epoch is a time smaller than seconds -> m/sim_epoch = VEL * sim_time_epoch */
+		actuator_state->m_per_epoch = VELOCITY_IN_M_PER_S * environment.sim_time_computation_epoch_s;
+		/* angle is rad/s and simulator epoch is a time smaller than seconds -> rad/sim_epoch = RAD * sim_time_epoch */
+		actuator_state->angle_per_epoch = TURN_IN_DEGREES_PER_S * environment.sim_time_computation_epoch_s;
+		actuator_state->last_instruction_time_start = 0;
+		actuator_state->last_instruction_time_end = 0;
+
+		/* store as memory */
+		actuator->general_memory = (void*)actuator_state;
+	}
+	else
+	{
+		/* extract memory */
+		actuator_state = (actuator_state_t*)(actuator->general_memory);
+	}
+
+	if (inputs->new_instruction == TRUE)
+	{
+		/* record time of instruction and when should end */
+		actuator_state->last_instruction_time_start = current_time;
+		actuator_state->last_instruction_time_end = current_time + inputs->time_in_s;
+
+		/* get direction */
+		if (inputs->left == 1 && inputs->right == 1)
+		{
+			actuator_state->move_type = FORWARD;
+		}
+		else if (inputs->left == -1 && inputs->right == -11)
+		{
+			actuator_state->move_type = BACKWARDS;
+		}
+		else if (inputs->left == 0 && inputs->right == 0)
+		{
+			actuator_state->move_type = STOPPED;
+		}
+		else if (inputs->left == 1 && inputs->right == 0)
+		{
+			actuator_state->move_type = LEFT;
+		}
+		else if (inputs->left == 0 && inputs->right == 1)
+		{
+			actuator_state->move_type = RIGHT;
+		}
+		else 
+		{
+			printf("Actuator unsupported movement\n");
+			exit(-1);
+		}
+	}
+
+	/* check to see if instruction is completed */
+	if (current_time < actuator_state->last_instruction_time_end)
+	{
+		switch (actuator_state->move_type)
+		{
+			case FORWARD:
+				move(agent, actuator_state->m_per_epoch);
+				break;
+			case BACKWARDS:
+				move(agent, -(actuator_state->m_per_epoch));
+				break;
+			case LEFT: // counter clock wise
+				turn(agent, -(actuator_state->angle_per_epoch));
+				break;
+			case RIGHT: // clock wise
+				turn(agent, actuator_state->angle_per_epoch);
+				break;
+			default:
+				oassert(FALSE);
+		}
+	}
+}

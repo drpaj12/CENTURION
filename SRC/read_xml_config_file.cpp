@@ -364,6 +364,8 @@ void read_config_file(char *config_file_name)
 									for (i = 0; i < agent_groups.agent_group[agent_group_idx]->num_actuators; i++)
 									{
 										agent_groups.agent_group[agent_group_idx]->actuators[i] = (actuator_t*)malloc(sizeof(actuator_t));
+										agent_groups.agent_group[agent_group_idx]->actuators[i]->general_memory = NULL; 
+										agent_groups.agent_group[agent_group_idx]->actuators[i]->initialized = FALSE;
 									}
 									actuator_idx = 0;
 
@@ -379,14 +381,9 @@ void read_config_file(char *config_file_name)
 		                                                                        string_data = xmlNodeListGetString(doc, actuator_xmlptr->xmlChildrenNode, 1);
 											/* setup actuator function */
 											setup_function_for_actuator(agent_groups.agent_group[agent_group_idx]->actuators[actuator_idx], (char*)string_data);
+
+											actuator_idx++;
 		                                                                }
-										else if ((!xmlStrcmp(actuator_xmlptr->name, (const xmlChar *)"sim_time_computation_epoch_s")))
-		                                                                {
-		                                                                        string_data = xmlNodeListGetString(doc, actuator_xmlptr->xmlChildrenNode, 1);
-		                                                                       	agent_groups.agent_group[agent_group_idx]->actuators[actuator_idx]->sim_time_computation_epoch_s = atof((char*)string_data);
-		                                                                        xmlFree(string_data);
-											actuator_idx ++;
-										}
 		
 		                                                                actuator_xmlptr = actuator_xmlptr->next;
 		                                                        }

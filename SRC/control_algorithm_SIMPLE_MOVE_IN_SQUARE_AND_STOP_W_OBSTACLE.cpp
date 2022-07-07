@@ -37,11 +37,15 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 /* globals */
 
+/* Where the sensors and actuators are read in from in terms of data structure */
 #define IDEAL_BEAM_SENSOR 0
 #define IDEAL_TWO_WHEEL 0
+
 /*-------------------------------------------------------------------------
  * (function:control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE )
  * 	Assume this robot has ideal_two_wheel acuator and an ideal beam sensor
+ * 	The control goes in a square where 3s for 3cm and 9s for 90 degree turn
+ * 	Simulation shows it's off by a bit
  *-----------------------------------------------------------------------*/
 void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent, double current_time) 
 {
@@ -69,6 +73,8 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 		/* tell robot to stop */
 		actuator_input.left = 0;
 		actuator_input.right = 0;
+		actuator_input.time_in_s = 0;
+		actuator_input.new_instruction = FALSE;
 	}
 	else
 	{
@@ -83,6 +89,7 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				/* actuator inputs */
 				actuator_input.left = 0;
 				actuator_input.right = 0;
+				actuator_input.new_instruction = FALSE;
 
 				agent->CURRENT_STATE = S_START_FORWARD;
 				break;
@@ -92,6 +99,8 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				/* actuator inputs */
 				actuator_input.left = 1;
 				actuator_input.right = 1;
+				actuator_input.time_in_s = 3; // 3s at 1cm/s = 3cm
+				actuator_input.new_instruction = TRUE;
 
 				agent->CURRENT_STATE = S_FORWARD;
 				break;
@@ -99,10 +108,9 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				agent->time_in_state += current_time - agent->last_time;	
 
 				/* actuator inputs */
-				actuator_input.left = 1;
-				actuator_input.right = 1;
+				actuator_input.new_instruction = FALSE;
 
-				if (agent->time_in_state < 15)
+				if (agent->time_in_state < 3)
 					agent->CURRENT_STATE = S_FORWARD;
 				else
 					agent->CURRENT_STATE = S_START_TURN_LEFT;
@@ -113,6 +121,8 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				/* actuator inputs */
 				actuator_input.left = 1;
 				actuator_input.right = 0;
+				actuator_input.time_in_s = 9; // 9s at 10degrees per second = 90 degrees
+				actuator_input.new_instruction = TRUE;
 
 				agent->CURRENT_STATE = S_TURN_LEFT;
 				break;
@@ -120,10 +130,9 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				agent->time_in_state += current_time - agent->last_time;	
 
 				/* actuator inputs */
-				actuator_input.left = 1;
-				actuator_input.right = 0;
+				actuator_input.new_instruction = FALSE;
 
-				if (agent->time_in_state < 15)
+				if (agent->time_in_state < 9)
 					agent->CURRENT_STATE = S_TURN_LEFT;
 				else
 					agent->CURRENT_STATE = S_START_FORWARD;
@@ -132,8 +141,7 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				/* if back here then object no longer 5cm away */
 
 				/* actuator inputs */
-				actuator_input.left = 0;
-				actuator_input.right = 0;
+				actuator_input.new_instruction = FALSE;
 
 				agent->CURRENT_STATE = ((int*)(agent->general_memory))[0];
 				break;
@@ -146,6 +154,8 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 
 	/* move actuator */
 	run_actuator( agent->agent_group->actuators[IDEAL_TWO_WHEEL], agent, &(actuator_input), current_time);
+
+	printf("Robot at location x=%f, y=%f, angle=%f (degrees=%f)\n", agent->x, agent->y, agent->angle, agent->angle * (180.0 / PI));
 
 	/* record last time for tracking details */
 	agent->last_time = current_time;

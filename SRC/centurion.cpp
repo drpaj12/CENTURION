@@ -46,7 +46,6 @@ atons_t atons;
 communication_stack_t comm_stack;
 
 FILE *f_log_out;
-FILE *f_debug_out;
 
 /* prototypes */
 void get_options(int argc, char** argv);
@@ -66,10 +65,10 @@ int main(int argc, char **argv)
 	/* check parameters */
 
 	/* open final ouput files */
-	f_debug_out = fopen(sim_system.debug_file_out, "w");
-	oassert(f_debug_out != NULL);
-	f_log_out = fopen(sim_system.sim_log_file_out, "w");
-	oassert(f_log_out != NULL);
+	sim_system.Fdebug_out = fopen(sim_system.debug_file_out, "w");
+	oassert(sim_system.Fdebug_out != NULL);
+	sim_system.Fsim_log_out = fopen(sim_system.sim_log_file_out, "w");
+	oassert(sim_system.Fsim_log_out != NULL);
 
 	/* set randomization */
 	srand(sim_system.rand_seed);
@@ -93,8 +92,8 @@ int main(int argc, char **argv)
 
 	/*-------------------FREE_PROBLEM------------------*/
 	/* free the problem */
-	fclose(f_debug_out);
-	fclose(f_log_out);
+	fclose(sim_system.Fdebug_out);
+	fclose(sim_system.Fsim_log_out);
 
 	return 1;
 }

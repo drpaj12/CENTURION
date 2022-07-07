@@ -9,8 +9,8 @@
 		<real_size_x_in_m>2.00</real_size_x_in_m>
 		<real_size_y_in_m>1.30</real_size_y_in_m>
 		<sim_grid_size_in_m>0.01</sim_grid_size_in_m>
-		<sim_time_s>10</sim_time_s>
-		<sim_time_computation_epoch_s>0.5</sim_time_computation_epoch_s>
+		<sim_time_s>60</sim_time_s>
+		<sim_time_computation_epoch_s>0.1</sim_time_computation_epoch_s>
 		<boundary_walls>FALSE</boundary_walls>
 		<objects>
 			<num_objects>2</num_objects>
@@ -53,7 +53,7 @@
 				<!-- list of agents.  Must have x and ys == to match num_agents_in_group above.
 				     Also, note, code is not smart and expects, <x> then <y> then <angle> ... angle MUST be last -->
 				<list>
-					<x>0.5</x><y>0.4</y><angle>75</angle>
+					<x>0.5</x><y>0.4</y><angle>1.30952</angle>
 					<x>0.7</x><y>0.7</y><angle>0</angle>
 				</list>
 			</initialization_of_agents>
@@ -80,10 +80,9 @@
 			<actuators>
 				<num_actuators>1</num_actuators>
 				<actuator>
+					<!-- <type> needs to be the last parameter -->
 					<type>IDEAL_TWO_WHEEL</type>
 					<!--<type>TWO_WHEEL</type>-->
-					<!-- this needs to be the last parameter -->
-					<sim_time_computation_epoch_s>1</sim_time_computation_epoch_s>
 				</actuator>
 			</actuators>
 			<!-- control must always be included and is last item in agent group -->

@@ -31,6 +31,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define FALSE 0
 #endif
 
+#define PI    3.1415926359
+#define twoPI 6.2831853072
+
 #include <stdlib.h>
 
 #include "argparse_value.hpp"
@@ -78,7 +81,7 @@ struct sim_obj_t
 /* different types of sensor */
 struct sensor_t_t 
 {
-	double angle; // <!-- assume 0 = 0 degrees facing forward of robot -->
+	double angle; // <!-- assume 0 = 0 radian angle facing forward of robot, 1.57079 is facing East, and 3.14 is facing backwards (clockwise rotation) --> 
 	double sim_time_computation_epoch_s; // how fast the sensor reads
 	double time_of_last_read_s;
 
@@ -91,14 +94,17 @@ struct act_inputs_t_t
 {
 	double left;
 	double right;
+	double time_in_s;
+	short new_instruction;
 };
 	
 /* different types of actuators */
 struct actuator_t_t 
 {
-	double sim_time_computation_epoch_s; // how fast the sensor reads
-
 	void (*fptr_actuator)(actuator_t *actuator, agent_t *agent, act_inputs_t *values, double current_time);
+
+	void *general_memory;
+	short initialized;
 };
 
 /* different types of agent */
@@ -109,7 +115,7 @@ struct agent_t_t
 	/* personal state */
 	double x;
 	double y;
-	double angle; // assuming in degrees where 0 degrees is North
+	double angle; // assuming in radians where 0 degrees is North and south is "pi" = 3.14
 	
 	void *general_memory;
 
@@ -170,7 +176,9 @@ struct sim_system_t_t
 {
 	int rand_seed;
 	char *debug_file_out;
+	FILE *Fdebug_out;
 	char *sim_log_file_out;
+	FILE *Fsim_log_out;
 	char *simulation_type;
 };
 
