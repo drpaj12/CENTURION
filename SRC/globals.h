@@ -33,3 +33,6 @@ extern environment_t environment;
 extern agent_groups_t agent_groups;
 extern atons_t atons;
 extern communication_stack_t comm_stack;
+
+extern sim_obj_t **sim_objects;
+extern int num_sim_objects;

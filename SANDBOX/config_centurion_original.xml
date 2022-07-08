@@ -53,16 +53,16 @@
 				<!-- list of agents.  Must have x and ys == to match num_agents_in_group above.
 				     Also, note, code is not smart and expects, <x> then <y> then <angle> ... angle MUST be last -->
 				<list>
-					<x>0.5</x><y>0.4</y><angle>1.30952</angle>
-					<x>0.7</x><y>0.7</y><angle>0</angle>
+					<x>0.4</x><y>0.4</y><angle>0</angle>
+					<x>1.0</x><y>1.0</y><angle>0</angle>
 				</list>
 			</initialization_of_agents>
 			<!-- robots are currently spheres, x1 and y1 don't matter -->
 			<object>
 				<sphere>
 					<x1>0.5</x1>
-					<y1>0.23</y1>
-					<radius>0.23</radius>
+					<y1>0.5</y1>
+					<radius>0.1</radius> <!-- 10cm radius robots
 				</sphere>
 			</object>
 			<sensors>

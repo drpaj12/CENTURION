@@ -79,14 +79,18 @@ struct sim_obj_t
 };
 
 /* different types of sensor */
+/* ASSUMPTION - sensor mounted at very front of robot, Radius of robot */
 struct sensor_t_t 
 {
 	double angle; // <!-- assume 0 = 0 radian angle facing forward of robot, 1.57079 is facing East, and 3.14 is facing backwards (clockwise rotation) --> 
 	double sim_time_computation_epoch_s; // how fast the sensor reads
-	double time_of_last_read_s;
 
 	/* the function that returns void * data for what sensor sees */
 	void* (*fptr_sensor)(sensor_t *sensor, agent_t *agent, double current_time);
+
+	/* sensor internal sim state */
+	void *general_memory;
+	short initialized;
 };
 
 /* inputs to an actuator */
@@ -103,6 +107,7 @@ struct actuator_t_t
 {
 	void (*fptr_actuator)(actuator_t *actuator, agent_t *agent, act_inputs_t *values, double current_time);
 
+	/* actuator internal sim state */
 	void *general_memory;
 	short initialized;
 };
@@ -210,5 +215,62 @@ typedef struct str_t {
 	int len, alloc;
 	unsigned char *s;
 } bstr_t, *bstr;
+
+/* SHAPES in simulation */
+typedef struct vector_2D_t_t vector_2D_t;
+typedef struct line_t_t line_t;
+typedef struct line_segment_t_t line_segment_t;
+typedef struct rectangle_t_t rectangle_t;
+typedef struct oriented_rectangle_t_t oriented_rectangle_t;
+typedef struct circle_t_t circle_t;
+typedef struct range_t_t range_t;
+
+struct vector_2D_t_t 
+{
+	double x;
+	double y;
+};
+
+/* line is infinite */
+/* base is point where it starts, direction is vector it goes out on */
+struct line_t_t
+{
+	vector_2D_t base;
+	vector_2D_t direction;
+};
+/* line segment is point1 and point2 */
+struct line_segment_t_t
+{
+	vector_2D_t point1;
+	vector_2D_t point2;
+};
+
+/* axis oreinted rectangle */
+struct rectangle_t_t
+{
+	vector_2D_t origin;
+	vector_2D_t size;
+};
+
+/* oreinted rectangle */
+struct oriented_rectangle_t_t
+{
+	vector_2D_t center;
+	vector_2D_t halfExtend;
+	double rotation;
+};
+
+/* axis oreinted rectangle */
+struct circle_t_t
+{
+	vector_2D_t center;
+	double radius;
+};
+
+struct range_t_t
+{
+	double minimum;
+	double maximum;
+};
 
 #endif // TYPES_H

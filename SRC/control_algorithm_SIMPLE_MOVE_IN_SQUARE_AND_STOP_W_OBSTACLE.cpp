@@ -41,6 +41,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define IDEAL_BEAM_SENSOR 0
 #define IDEAL_TWO_WHEEL 0
 
+// 10s * 1cm/s = 10cm
+#define FORWARD_TIME 10
+// 10degrees * 9s = 90 degrees
+#define TURN_TIME 9
+
 /*-------------------------------------------------------------------------
  * (function:control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE )
  * 	Assume this robot has ideal_two_wheel acuator and an ideal beam sensor
@@ -99,7 +104,7 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				/* actuator inputs */
 				actuator_input.left = 1;
 				actuator_input.right = 1;
-				actuator_input.time_in_s = 3; // 3s at 1cm/s = 3cm
+				actuator_input.time_in_s = FORWARD_TIME; // s at 1cm/s = 10cm
 				actuator_input.new_instruction = TRUE;
 
 				agent->CURRENT_STATE = S_FORWARD;
@@ -110,7 +115,7 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				/* actuator inputs */
 				actuator_input.new_instruction = FALSE;
 
-				if (agent->time_in_state < 3)
+				if (agent->time_in_state < FORWARD_TIME)
 					agent->CURRENT_STATE = S_FORWARD;
 				else
 					agent->CURRENT_STATE = S_START_TURN_LEFT;
@@ -121,7 +126,7 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				/* actuator inputs */
 				actuator_input.left = 1;
 				actuator_input.right = 0;
-				actuator_input.time_in_s = 9; // 9s at 10degrees per second = 90 degrees
+				actuator_input.time_in_s = TURN_TIME; // 9s at 10degrees per second = 90 degrees
 				actuator_input.new_instruction = TRUE;
 
 				agent->CURRENT_STATE = S_TURN_LEFT;
@@ -132,7 +137,7 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				/* actuator inputs */
 				actuator_input.new_instruction = FALSE;
 
-				if (agent->time_in_state < 9)
+				if (agent->time_in_state < TURN_TIME)
 					agent->CURRENT_STATE = S_TURN_LEFT;
 				else
 					agent->CURRENT_STATE = S_START_FORWARD;

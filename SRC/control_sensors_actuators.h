@@ -47,6 +47,7 @@ typedef struct beam_sensor_t_t beam_sensor_t;
 struct beam_sensor_t_t
 {
 	double in_m;
+	short new_data;
 };
 
 #endif
