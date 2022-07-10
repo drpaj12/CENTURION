@@ -160,7 +160,7 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 	/* move actuator */
 	run_actuator( agent->agent_group->actuators[IDEAL_TWO_WHEEL], agent, &(actuator_input), current_time);
 
-	printf("Robot at location x=%f, y=%f, angle=%f (degrees=%f)\n", agent->x, agent->y, agent->angle, agent->angle * (180.0 / PI));
+	printf("Robot at location x=%f, y=%f, angle=%f (degrees=%f)\n", agent->circle->center.x, agent->circle->center.y, agent->angle, agent->angle * (180.0 / PI));
 
 	/* record last time for tracking details */
 	agent->last_time = current_time;

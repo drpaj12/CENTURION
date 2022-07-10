@@ -61,6 +61,9 @@ void* sensor_function_IDEAL_BEAM(sensor_t *sensor, agent_t *agent, double curren
 
 	sensor_state_t* sensor_state;
 
+	return_sensor_reading->in_m = 1;
+	return_sensor_reading->new_data = TRUE;
+#if 0
 	if (sensor->initialized == FALSE)
 	{	
 		sensor->initialized = TRUE;
@@ -98,9 +101,10 @@ void* sensor_function_IDEAL_BEAM(sensor_t *sensor, agent_t *agent, double curren
 	}
 
 	return (void*)return_sensor_reading;
+#endif
 }
 
-sim_obj_t* find_closest_object_on_beam_projection(double x, double y, double angle)
+sim_obj_t* find_closest_object_on_beam_projection(agent_t *agent_self, double x, double y, double angle)
 {
 	int i;
 
@@ -108,25 +112,28 @@ sim_obj_t* find_closest_object_on_beam_projection(double x, double y, double ang
 	{
 		if (sim_objects[i]->type == OBJECT)
 		{
-			if (sim_objects[i]->object->type == SPHERE)
+			if (sim_objects[i]->object->type == CIRCLE)
 			{
 			}
-			else if (sim_objects[i]->object->type == QUADRILATERAL)
+			else if (sim_objects[i]->object->type == RECTANGLE)
 			{
 			}
 		}
 		else if (sim_objects[i]->type == AGENT)
 		{
-			if (sim_objects[i]->agent == agent)
+			if (sim_objects[i]->agent == agent_self)
 				continue;
 			else 
 			{
+#if 0
 				agent_x = sim_objects[i]->agent->x;
 				agent_y = sim_objects[i]->agent->y;
 				/* assume robots only spheres */
-				oassert(sim_objects[i]->agent->agent_group->shape->type == SPHERE);
+				oassert(sim_objects[i]->agent->agent_group->shape->type == CIRCLE);
 				agent_radius = sim_objects[i]->agent->agent_group->shape->radius;
 			run_agent_control(sim_objects[i]->agent, current_time);
+#endif
+			}
 		}
-
+	}
 }

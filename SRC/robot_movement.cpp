@@ -41,8 +41,8 @@ OTHER DEALINGS IN THE SOFTWARE.
  *-----------------------------------------------------------------------*/
 void move(agent_t *agent, double distance_in_m)
 {
-	agent->x = agent->x + cos(agent->angle) * distance_in_m;
-	agent->y = agent->y + sin(agent->angle) * distance_in_m;
+	agent->circle->center.x = agent->circle->center.x + cos(agent->angle) * distance_in_m;
+	agent->circle->center.y = agent->circle->center.y + sin(agent->angle) * distance_in_m;
 }
 
 /*-------------------------------------------------------------------------

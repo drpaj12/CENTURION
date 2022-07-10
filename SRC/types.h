@@ -57,6 +57,16 @@ typedef struct sim_system_t_t sim_system_t;
 typedef struct environment_t_t environment_t;
 typedef struct communication_stack_t_t communication_stack_t;
 typedef struct atons_t_t atons_t;
+/* SHAPES in simulation */
+typedef struct vector_2D_t_t vector_2D_t;
+typedef struct line_t_t line_t;
+typedef struct line_segment_t_t line_segment_t;
+typedef struct rectangle_t_t rectangle_t;
+typedef struct oriented_rectangle_t_t oriented_rectangle_t;
+typedef struct circle_t_t circle_t;
+typedef struct range_t_t range_t;
+
+
 
 /* the global arguments of the software */
 struct global_args_t_t
@@ -118,9 +128,8 @@ struct agent_t_t
 	agent_group_t *agent_group; // back pointer to description of agent
 
 	/* personal state */
-	double x;
-	double y;
 	double angle; // assuming in radians where 0 degrees is North and south is "pi" = 3.14
+	circle_t *circle;
 	
 	void *general_memory;
 
@@ -132,20 +141,13 @@ struct agent_t_t
 	/* personal goals */
 };
 
-enum shape_type {SPHERE, QUADRILATERAL};
+enum shape_type {CIRCLE, RECTANGLE};
 /* the objects in the environment - sphere or quadrilateral */
 struct objects_t_t 
 {
 	shape_type type;
-	double radius;
-	double x1;
-	double y1;
-	double x2;
-	double y2;
-	double x3;
-	double y3;
-	double x4;
-	double y4;
+	circle_t *circle;
+	oriented_rectangle_t *rectangle;
 };
 
 /* different types of agent groups */
@@ -215,15 +217,6 @@ typedef struct str_t {
 	int len, alloc;
 	unsigned char *s;
 } bstr_t, *bstr;
-
-/* SHAPES in simulation */
-typedef struct vector_2D_t_t vector_2D_t;
-typedef struct line_t_t line_t;
-typedef struct line_segment_t_t line_segment_t;
-typedef struct rectangle_t_t rectangle_t;
-typedef struct oriented_rectangle_t_t oriented_rectangle_t;
-typedef struct circle_t_t circle_t;
-typedef struct range_t_t range_t;
 
 struct vector_2D_t_t 
 {

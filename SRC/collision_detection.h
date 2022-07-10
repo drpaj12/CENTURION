@@ -29,53 +29,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef COLLISSION_H
 #define COLLISSION_H
 
-#if 0
-vector_2D_t add_vector(vector_2D_t a, vector_2D_t b);
-vector_2D_t subtract_vector(vector_2D_t a, vector_2D_t b);
-vector_2D_t negate_vector(vector_2D_t v);
-short equal_doubles(double a, double b);
-short equal_vectors(vector_2D_t a, vector_2D_t b);
-vector_2D_t multiply_vector(vector_2D_t v, double scalar);
-vector_2D_t divide_vector(vector_2D_t v, double divisor);
-double vector_length(vector_2D_t a);
-vector_2D_t unit_vector(vector_2D_t v);
-double degrees_to_radian(double degrees);
-double radian_to_degrees(double radians);
-vector_2D_t rotate_vector_degrees(vector_2D_t v, double degrees);
-vector_2D_t rotate_vector_radians(vector_2D_t v, double radians);
-double dot_product(vector_2D_t a, vector_2D_t b);
-double enclosed_angle_degrees(vector_2D_t a, vector_2D_t b);
-double enclosed_angle_radians(vector_2D_t a, vector_2D_t b);
-vector_2D_t project_vector(vector_2D_t project, vector_2D_t onto);
-short overlapping(double minA, double maxA, double minB, double maxB);
-vector_2D_t rotate_vector_90(vector_2D_t v);
-short parallel_vectors(vector_2D_t a, vector_2D_t b);
-short equivalent_lines(line_t a, line_t b);
-short on_one_side(line_t axis, line_segment_t s);
-range_t sort_range(range_t r);
-range_t project_segment(line_segment_t s, vector_2D_t onto);
-short overlapping_ranges(range_t a, range_t b);
-range_t range_hull(range_t a, range_t b);
-line_segment_t oriented_rectangle_edge(oriented_rectangle_t r, int nr);
-short separating_axis_for_oriented_rectangle( line_segment_t axis, oriented_rectangle_t r);
-double clamp_on_range(double x, double min, double max);
-vector_2D_t clamp_on_rectangle(vector_2D_t p, rectangle_t r);
-
-short lines_collide(line_t a, line_t b);
-short rectangles_collide(rectangle_t a, rectangle_t b);
-short circles_collide(circle_t a, circle_t b);
-short points_collide(vector_2D_t a, vector_2D_t b);
-short segments_collide(line_segment_t a, line_segment_t b);
-short oriented_rectangles_collide( oriented_rectangle_t a, oriented_rectangle_t b);
-short circle_point_collide(circle_t c, vector_2D_t p);
-short circle_line_collide(circle_t c, line_t l);
-short circle_segment_collide(circle_t c, line_segment_t s);
-short circle_rectangle_collide(circle_t c, rectangle_t r);
-short circle_oriented_rectangle_collide( circle_t c, oriented_rectangle_t r);
-short rectangle_segment_collide(rectangle_t r, line_segment_t s);
-short oriented_rectangle_segment_collide(oriented_rectangle_t r, line_segment_t s);
-#endif
-
 short circles_collide( circle_t* a,  circle_t* b);
 short circle_point_collide( circle_t* c,  vector_2D_t* p);
 short circle_line_collide( circle_t* c,  line_t* l);
@@ -96,6 +49,7 @@ short oriented_rectangle_point_collide( oriented_rectangle_t_t* r,  vector_2D_t*
 short oriented_rectangle_rectangle_collide( oriented_rectangle_t_t* orect,  rectangle_t* aar);;
 short rectangle_segment_collide( rectangle_t* r,  line_segment_t* s);
 short oriented_rectangle_segment_collide( oriented_rectangle_t_t* r,  line_segment_t* s);
+
 short overlapping(double minA, double maxA, double minB, double maxB);
 range_t project_segment( line_segment_t* s,  vector_2D_t* onto, short ontoIsUnit);
 short on_one_side( line_t* axis,  line_segment_t* s);

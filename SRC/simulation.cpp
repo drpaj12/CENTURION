@@ -122,7 +122,7 @@ void simulation_loop()
 			}
 			else if (sim_objects[i]->type == AGENT)
 			{
-				fprintf(sim_system.Fsim_log_out, "time:%f - %d - x:%f, y:%f, angle:%f, angle_d:%f\n", current_time, i, sim_objects[i]->agent->x, sim_objects[i]->agent->y, sim_objects[i]->agent->angle, sim_objects[i]->agent->angle * (180.0 / PI));
+				fprintf(sim_system.Fsim_log_out, "time:%f - %d - x:%f, y:%f, angle:%f, angle_d:%f\n", current_time, i, sim_objects[i]->agent->circle->center.x, sim_objects[i]->agent->circle->center.y, sim_objects[i]->agent->angle, sim_objects[i]->agent->angle * (180.0 / PI));
 			}
 		}
 

@@ -9,29 +9,26 @@
 		<real_size_x_in_m>2.00</real_size_x_in_m>
 		<real_size_y_in_m>1.30</real_size_y_in_m>
 		<sim_grid_size_in_m>0.01</sim_grid_size_in_m>
-		<sim_time_s>60</sim_time_s>
+		<sim_time_s>80</sim_time_s>
 		<sim_time_computation_epoch_s>0.1</sim_time_computation_epoch_s>
 		<boundary_walls>FALSE</boundary_walls>
 		<objects>
 			<num_objects>2</num_objects>
 			<object>
-				<sphere>
-					<x1>0.5</x1>
-					<y1>0.23</y1>
+				<circle>
+					<x>0.5</x>
+					<y>0.23</y>
 					<radius>0.23</radius>
-				</sphere>
+				</circle>
 			</object>
 			<object>
-				<quadrilateral>
-					<x1>0.1</x1>
-					<y1>0.1</y1>
-					<x2>0.3</x2>
-					<y2>0.3</y2>
-					<x3>0.1</x3>
-					<y3>0.2</y3>
-					<x4>0.4</x4>
-					<y4>0.3</y4>
-				</quadrilateral>
+				<rectangle>
+					<center_x>0.1</center_x>
+					<center_y>0.1</center_y>
+					<halfExtend_x>0.3</halfExtend_x>
+					<halfExtend_y>0.3</halfExtend_y>
+					<rotation>0.1</rotation>
+				</rectangle>
 			</object>
 		</objects>
 	</environment>
@@ -59,11 +56,11 @@
 			</initialization_of_agents>
 			<!-- robots are currently spheres, x1 and y1 don't matter -->
 			<object>
-				<sphere>
-					<x1>0.5</x1>
-					<y1>0.5</y1>
-					<radius>0.1</radius> <!-- 10cm radius robots
-				</sphere>
+				<circle>
+					<x>0.5</x>
+					<y>0.23</y>
+					<radius>0.23</radius>
+				</circle>
 			</object>
 			<sensors>
 				<num_sensors>1</num_sensors>
