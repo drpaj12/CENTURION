@@ -232,6 +232,7 @@ void read_config_file(char *config_file_name)
 								agent_groups.agent_group[agent_group_idx]->agents[i]->CURRENT_STATE = 0;
 								/* allocate a circle */
 								agent_groups.agent_group[agent_group_idx]->agents[i]->circle = (circle_t*)malloc(sizeof(circle_t));
+								agent_groups.agent_group[agent_group_idx]->agents[i]->not_physical_agent = TRUE;
 							}
 						}
 						else if ((!xmlStrcmp(agent_group_xmlptr->name, (const xmlChar *)"initialization_of_agents")))
@@ -295,6 +296,7 @@ void read_config_file(char *config_file_name)
 							for (i = 0; i < agent_groups.agent_group[agent_group_idx]->num_agents; i++)
 							{
 								agent_groups.agent_group[agent_group_idx]->agents[i]->circle->radius = agent_groups.agent_group[agent_group_idx]->shape->circle->radius;
+								agent_groups.agent_group[agent_group_idx]->agents[i]->not_physical_agent = FALSE;
 							}
 						}
 						else if ((!xmlStrcmp(agent_group_xmlptr->name, (const xmlChar *)"sensors")))

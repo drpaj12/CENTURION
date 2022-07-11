@@ -29,6 +29,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 #ifndef COLLISSION_H
 #define COLLISSION_H
 
+points_t *segment_intersects_circle_at(line_segment_t *line_segment, circle_t *circle);
+points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment, oriented_rectangle_t *rectangle) ;
+
+short line_segments_intersect_at(line_segment_t *A, line_segment_t *B, vector_2D_t *intersection) ;
+
 short circles_collide( circle_t* a,  circle_t* b);
 short circle_point_collide( circle_t* c,  vector_2D_t* p);
 short circle_line_collide( circle_t* c,  line_t* l);

@@ -26,12 +26,14 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "types.h"
 #include "globals.h"
 #include "utils.h"
 
 #include "control_sensors_actuators.h"
+#include "collision_detection.h"
 
 /* globals */
 int num_sensor_names = 3; // number of strings below and in enum
@@ -83,5 +85,174 @@ void setup_function_for_sensor(sensor_t *sensor, char *function_name)
 	}
 }
 
+/*-------------------------------------------------------------------------
+ * (function: find_closest_object_on_beam_projection )
+ *-----------------------------------------------------------------------*/
+beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_reading, agent_t *agent_self, double x, double y, double beam_distance, double angle_radians)
+{
+	int i, j;
+	points_t *points_of_intersect;
 
+	vector_2D_t start_point;
+	start_point.x = x;
+	start_point.y = y;
 
+	vector_2D_t end_point;
+	end_point.x = x + cos(angle_radians) * beam_distance;
+	end_point.y = y + sin(angle_radians) * beam_distance;
+
+	line_segment_t beam_segment;
+	beam_segment.point1 = start_point;
+	beam_segment.point2 = end_point;
+
+	circle_t *circle;
+	oriented_rectangle_t *rectangle;
+
+	printf("sensor_beam line_segemnt -> x=%f y=%f to x1=%f y=%f\n", start_point.x, start_point.y, end_point.x, end_point.y);
+
+	sim_obj_t *closest_obj = NULL;
+	double min_distance = 2*beam_distance;
+
+	for (i = 0; i < num_sim_objects; i++)
+	{
+		circle = NULL;
+		rectangle = NULL;
+
+		sim_obj_t *potential_closest = sim_objects[i];
+		double min_distance_pot = 0;
+
+		if (sim_objects[i]->type == OBJECT)
+		{
+			if (sim_objects[i]->object->type == CIRCLE)
+			{
+				circle = sim_objects[i]->object->circle;
+			}
+			else if (sim_objects[i]->object->type == RECTANGLE)
+			{
+				rectangle = sim_objects[i]->object->rectangle;
+			}
+		}
+		else if (sim_objects[i]->type == AGENT)
+		{
+			if (sim_objects[i]->agent == agent_self || sim_objects[i]->agent->not_physical_agent == TRUE)
+				continue;
+			else 
+			{
+				/* assume robots only spheres */
+				oassert(sim_objects[i]->agent->agent_group->shape->type == CIRCLE);
+				circle = sim_objects[i]->agent->circle;
+			}
+		}
+
+		if (circle != NULL)
+		{
+			points_of_intersect = segment_intersects_circle_at(&beam_segment, circle); 
+
+			if (points_of_intersect == NULL)
+			{
+				printf("NO BEAM HIT on CIRCLE (%f, %f, %f)\n", circle->center.x, circle->center.y, circle->radius);
+			}
+			else
+			{
+				printf("BEAM HIT CIRCLE(%f, %f, %f)\n", circle->center.x, circle->center.y, circle->radius);
+				for (j = 0; j < points_of_intersect->num_points; j++)
+				{
+					printf("	POINT %d -> x=%f y=%f\n", i, points_of_intersect->points[i]->x, points_of_intersect->points[i]->y);
+				}
+
+			}
+		}
+		else if (rectangle != NULL)
+		{
+			points_of_intersect = segment_intersects_oriented_rectangle_at(&beam_segment, rectangle);
+
+			if (points_of_intersect == NULL)
+			{
+				printf("NO BEAM HIT on RECTANGLE ((%f,%f), (%f,%f), (%f,%f), (%f,%f))\n", 
+						rectangle->center.x - rectangle->halfExtend.x,
+						rectangle->center.y + rectangle->halfExtend.y,
+						rectangle->center.x + rectangle->halfExtend.x,
+						rectangle->center.y + rectangle->halfExtend.y,
+						rectangle->center.x - rectangle->halfExtend.x,
+						rectangle->center.y - rectangle->halfExtend.y,
+						rectangle->center.x + rectangle->halfExtend.x,
+						rectangle->center.y - rectangle->halfExtend.y);
+			}
+			else
+			{
+				printf("BEAM HIT on RECTANGLE ((%f,%f), (%f,%f), (%f,%f), (%f,%f))\n", 
+						rectangle->center.x - rectangle->halfExtend.x,
+						rectangle->center.y + rectangle->halfExtend.y,
+						rectangle->center.x + rectangle->halfExtend.x,
+						rectangle->center.y + rectangle->halfExtend.y,
+						rectangle->center.x - rectangle->halfExtend.x,
+						rectangle->center.y - rectangle->halfExtend.y,
+						rectangle->center.x + rectangle->halfExtend.x,
+						rectangle->center.y - rectangle->halfExtend.y);
+
+				for (i = 0; i < points_of_intersect->num_points; i++)
+				{
+					printf("	POINT %d -> x=%f y=%f\n", i, points_of_intersect->points[i]->x, points_of_intersect->points[i]->y);
+				}
+			}
+		}
+
+		if (points_of_intersect != NULL)
+		{
+			/* see if this point is closer than previous ones */
+			if (points_of_intersect->num_points == 2)
+			{
+				double d0 = vector_length(points_of_intersect->points[0]);
+				double d1 = vector_length(points_of_intersect->points[1]);
+	
+				if (d0 < min_distance && d0 < d1)
+				{
+					min_distance = d0;
+					closest_obj = potential_closest;
+				}
+				else if (d1 < min_distance)
+				{
+					min_distance = d1;
+					closest_obj = potential_closest;
+				}
+	
+				free (points_of_intersect->points[0]);
+				free (points_of_intersect->points[1]);
+				free (points_of_intersect->points);
+				free (points_of_intersect);
+			}
+			else if (points_of_intersect->num_points == 1)
+			{
+				double d0 = vector_length(points_of_intersect->points[0]);
+				double d1 = vector_length(points_of_intersect->points[1]);
+	
+				if (d0 < min_distance && d0 < d1)
+				{
+					min_distance = d0;
+					closest_obj = potential_closest;
+				}
+				else if (d1 < min_distance)
+				{
+					min_distance = d1;
+					closest_obj = potential_closest;
+				}
+	
+				free (points_of_intersect->points[0]);
+				free (points_of_intersect->points);
+				free (points_of_intersect);
+			}
+		}
+	}
+
+	if (closest_obj != NULL)
+	{
+		sensor_reading[0]->in_m = min_distance;
+		sensor_reading[0]->angle_phi = 0.0;
+	}
+	else
+	{
+		sensor_reading[0]->in_m = -1;
+		sensor_reading[0]->angle_phi = 0.0;
+	}
+
+}

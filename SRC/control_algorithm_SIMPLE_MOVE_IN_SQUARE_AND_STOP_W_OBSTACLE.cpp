@@ -70,7 +70,8 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 
 	printf("sensor reads %f meters\n", sensor_data->in_m);
 
-	if (sensor_data->in_m < 0.05)
+	/* sensor reads -1 if no objects */
+	if (sensor_data->in_m > 0.0 && sensor_data->in_m < 0.05)
 	{
 		/* if in 5cm of an object need to stop and store current state */
 		((int*)(agent->general_memory))[0] = agent->CURRENT_STATE;

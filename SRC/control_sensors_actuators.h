@@ -46,7 +46,9 @@ extern void actuator_function_TWO_WHEEL(actuator_t *actuator, agent_t *agent, ac
 typedef struct beam_sensor_t_t beam_sensor_t;
 struct beam_sensor_t_t
 {
-	double in_m;
+	double in_m; // distance to object
+	double angle_phi; // angle of the object
+
 	short new_data;
 };
 

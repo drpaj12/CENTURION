@@ -834,3 +834,359 @@ rectangle_t oriented_rectangle_rectangle_hull( oriented_rectangle_t* r)
 
 	return h;
 }
+ 
+/*---------------------------------------------------------------------------------------------
+ * (function: square)
+ *-------------------------------------------------------------------------------------------*/
+double square(double x) 
+{
+	return x * x;
+}
+ 
+/*---------------------------------------------------------------------------------------------
+ * (function: helper_point_within_rectangle)
+ *-------------------------------------------------------------------------------------------*/
+short helper_point_within_rectangle(double x1, double y1, double x2, double y2, double x, double y) 
+{
+	double epsilon = 1.0f / 8192.0f;/* should be small eFALSEugh for 1.0f == pixel width */
+
+	double d1 = sqrt(square(x2 - x1) + square(y2 - y1));	// distance between end-points
+	double d2 = sqrt(square(x - x1) + square(y - y1));	  // distance from point to one end
+	double d3 = sqrt(square(x2 - x) + square(y2 - y));	  // distance from point to other end
+	double delta = d1 - d2 - d3;
+
+	return fabs(delta) < epsilon;   // true if delta is less than a small tolerance
+}
+ 
+double helper_function_fx(double A, double B, double C, double x) 
+{
+	return -(A * x + C) / B;
+}
+double helper_function_fy(double A, double B, double C, double y) 
+{
+	return -(B * y + C) / A;
+}
+ 
+/*---------------------------------------------------------------------------------------------
+ * (function: segment_intersects_circle_at) 
+ * returns NULL if no intersection
+ *
+ * Prints the intersection points (if any) of a circle, center 'cp' with radius , 
+ * and either a segment drawn between those points.  
+ * CODE from : https://rosettacode.org/wiki/Line_circle_intersection#C
+ *-------------------------------------------------------------------------------------------*/
+points_t *segment_intersects_circle_at(line_segment_t *line_segment, circle_t *circle)
+{
+	double epsilon = 1.0f / 8192.0f;/* should be small eFALSEugh for 1.0f == pixel width */
+	double x0 = circle->center.x;
+       	double y0 = circle->center.y;
+	double x1 = line_segment->point1.x;
+	double y1 = line_segment->point1.y;
+	double x2 = line_segment->point2.x;
+       	double y2 = line_segment->point2.y;
+
+	double A = y2 - y1; // length ydir
+	double B = x1 - x2; // length xdir
+	double C = x2 * y1 - x1 * y2; //
+	double a = square(A) + square(B); // length vector
+	double b, c, d;
+	short bnz = TRUE;
+	int cnt = 0;
+
+	points_t *return_points = NULL;
+ 
+	if (fabs(B) >= epsilon) 
+	{
+		// if B isn't zero or close to it
+		b = 2 * (A * C + A * B * y0 - square(B) * x0);
+		c = square(C) + 2 * B * C * y0 - square(B) * (square(circle->radius) - square(x0) - square(y0));
+	} 
+	else 
+	{
+		b = 2 * (B * C + A * B * x0 - square(A) * y0);
+		c = square(C) + 2 * A * C * x0 - square(A) * (square(circle->radius) - square(x0) - square(y0));
+		bnz = false;
+	}
+	d = square(b) - 4 * a * c; // discriminant
+	if (d < 0) 
+	{
+		// line & circle don't intersect
+		return return_points;
+	}
+ 
+	if (d == 0) 
+	{
+		// line is tangent to circle, so just one intersect at most
+		
+		return_points = (points_t*)malloc(sizeof(points_t));
+		return_points->num_points = 1;
+		return_points->points = (vector_2D_t**)malloc(sizeof(vector_2D_t*));
+		return_points->points[0] = (vector_2D_t*)malloc(sizeof(vector_2D_t));
+
+		if (bnz) 
+		{
+			double x = -b / (2 * a);
+			double y = helper_function_fx(A, B, C, x);
+
+			if (helper_point_within_rectangle(x1, y1, x2, y2, x, y))
+			{
+				return_points->points[0]->x = x;	
+				return_points->points[0]->y = y;	
+			}
+			else
+			{
+				return_points->num_points = 0;
+				free(return_points->points[0]);
+				free(return_points->points);
+				free(return_points);
+				return_points = NULL;
+			}
+		} 
+		else 
+		{
+			double y = -b / (2 * a);
+			double x = helper_function_fy(A, B, C, y);
+
+			if (helper_point_within_rectangle(x1, y1, x2, y2, x, y))
+			{
+				return_points->points[0]->x = x;	
+				return_points->points[0]->y = y;	
+			}
+			else
+			{
+				return_points->num_points = 0;
+				free(return_points->points[0]);
+				free(return_points->points);
+				free(return_points);
+				return_points = NULL;
+			}
+		}
+	} 
+	else 
+	{
+		// two intersects at most
+		return_points = (points_t*)malloc(sizeof(points_t));
+		return_points->num_points = 2;
+		return_points->points = (vector_2D_t**)malloc(sizeof(vector_2D_t*)*2);
+		return_points->points[0] = (vector_2D_t*)malloc(sizeof(vector_2D_t));
+		return_points->points[1] = (vector_2D_t*)malloc(sizeof(vector_2D_t));
+		cnt = 1;
+
+		d = sqrt(d);
+		if (bnz) 
+		{
+			double x = (-b + d) / (2 * a);
+			double y = helper_function_fx(A, B, C, x);
+
+			if (helper_point_within_rectangle(x1, y1, x2, y2, x, y))
+			{
+				return_points->points[0]->x = x;	
+				return_points->points[0]->y = y;	
+			}
+			else
+			{
+				return_points->num_points --;
+				free(return_points->points[1]);
+				cnt--;
+			}
+ 
+			x = (-b - d) / (2 * a);
+			y = helper_function_fx(A, B, C, x);
+
+			if (helper_point_within_rectangle(x1, y1, x2, y2, x, y))
+			{
+				return_points->points[cnt]->x = x;	
+				return_points->points[cnt]->y = y;	
+			}
+			else if (cnt == 1)
+			{
+				return_points->num_points --;
+				free(return_points->points[cnt]);
+				cnt--;
+			}
+			else if (cnt == 0)
+			{
+				return_points->num_points = 0;
+				free(return_points->points[0]);
+				free(return_points->points);
+				free(return_points);
+				return_points = NULL;
+			}
+		} 
+		else 
+		{
+			double y = (-b + d) / (2 * a);
+			double x = helper_function_fy(A, B, C, y);
+
+			if (helper_point_within_rectangle(x1, y1, x2, y2, x, y))
+			{
+				return_points->points[0]->x = x;	
+				return_points->points[0]->y = y;	
+			}
+ 
+			y = (-b - d) / (2 * a);
+			x = helper_function_fy(A, B, C, y);
+
+			if (helper_point_within_rectangle(x1, y1, x2, y2, x, y))
+			{
+				return_points->points[cnt]->x = x;	
+				return_points->points[cnt]->y = y;	
+			}
+			else if (cnt == 1)
+			{
+				return_points->num_points --;
+				free(return_points->points[cnt]);
+				cnt--;
+			}
+			else if (cnt == 0)
+			{
+				return_points->num_points = 0;
+				free(return_points->points[0]);
+				free(return_points->points);
+				free(return_points);
+				return_points = NULL;
+			}
+		}
+	}
+ 
+	return return_points;
+}
+
+
+/*---------------------------------------------------------------------------------------------
+ * (function: line_segments_intersect_at) 
+ *
+ * From : http://paulbourke.net/geometry/pointlineplane/pdb.c
+   Determine the intersection point of two line segments
+   Return FALSE if the lines don't intersect
+*/
+short line_segments_intersect_at(line_segment_t *A, line_segment_t *B, vector_2D_t *intersection) 
+{
+	double mua,mub;
+	double denom,numera,numerb;
+	double epsilon = 1.0f / 8192.0f;/* should be small eFALSEugh for 1.0f == pixel width */
+
+	denom  = (B->point2.y-B->point1.y) * (A->point2.x-A->point1.x) - (B->point2.x-B->point1.x) * (A->point2.y-A->point1.y);
+	numera = (B->point2.x-B->point1.x) * (A->point1.y-B->point1.y) - (B->point2.y-B->point1.y) * (A->point1.x-B->point1.x);
+	numerb = (A->point2.x-A->point1.x) * (A->point1.y-B->point1.y) - (A->point2.y-A->point1.y) * (A->point1.x-B->point1.x);
+
+	/* Are the line coincident? */
+	if (abs(numera) < epsilon && abs(numerb) < epsilon && abs(denom) < epsilon) 
+	{
+		intersection->x = (A->point1.x + A->point2.x) / 2;
+		intersection->y = (A->point1.y + A->point2.y) / 2;
+		return(TRUE);
+	}
+
+	/* Are the line parallel */
+	if (abs(denom) < epsilon) 
+	{
+		intersection->x = 0;
+		intersection->y = 0;
+		return(FALSE);
+	}
+
+	/* Is the intersection along the the segments */
+	mua = numera / denom;
+	mub = numerb / denom;
+	if (mua < 0 || mua > 1 || mub < 0 || mub > 1) 
+	{
+		intersection->x = 0;
+		intersection->y = 0;
+		return(FALSE);
+	}
+	intersection->x = A->point1.x + mua * (A->point2.x - A->point1.x);
+	intersection->y = A->point1.y + mua * (A->point2.y - A->point1.y);
+	return(TRUE);
+}
+
+/*---------------------------------------------------------------------------------------------
+ * (function: segment_intersects_oriented_rectangle_at) 
+ *-------------------------------------------------------------------------------------------*/
+points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment, oriented_rectangle_t *rectangle) 
+{
+	/* rectangles points    a b
+	 * 			c d */
+	vector_2D_t a;
+	a.x = rectangle->center.x - rectangle->halfExtend.x;
+	a.y = rectangle->center.y + rectangle->halfExtend.y;
+	vector_2D_t b;
+	a.x = rectangle->center.x + rectangle->halfExtend.x;
+	a.y = rectangle->center.y + rectangle->halfExtend.y;
+	vector_2D_t c;
+	a.x = rectangle->center.x - rectangle->halfExtend.x;
+	a.y = rectangle->center.y - rectangle->halfExtend.y;
+	vector_2D_t d;
+	a.x = rectangle->center.x + rectangle->halfExtend.x;
+	a.y = rectangle->center.y - rectangle->halfExtend.y;
+
+	/* create line segments of rectangle */
+	line_segment_t a_b;
+	a_b.point1.x = a.x;
+	a_b.point1.y = a.y;
+	a_b.point2.x = b.x;
+	a_b.point2.y = b.y;
+	line_segment_t a_c;
+	a_c.point1.x = a.x;
+	a_c.point1.y = a.y;
+	a_c.point2.x = c.x;
+	a_c.point2.y = c.y;
+	line_segment_t b_d;
+	b_d.point1.x = b.x;
+	b_d.point1.y = b.y;
+	b_d.point2.x = d.x;
+	b_d.point2.y = d.y;
+	line_segment_t c_d;
+	c_d.point1.x = c.x;
+	c_d.point1.y = c.y;
+	c_d.point2.x = d.x;
+	c_d.point2.y = d.y;
+
+	points_t *return_points;	
+	return_points = (points_t *)malloc(sizeof(points_t));
+	return_points->points = (vector_2D_t **)malloc(sizeof(vector_2D_t*)*2);
+	return_points->num_points = 0;
+
+	vector_2D_t intersection_point;
+
+	if (line_segments_intersect_at(&a_b, line_segment, &intersection_point))
+	{
+		return_points->points[return_points->num_points] = (vector_2D_t *)malloc(sizeof(vector_2D_t));
+		return_points->points[return_points->num_points]->x = intersection_point.x;
+		return_points->points[return_points->num_points]->y = intersection_point.y;
+		return_points->num_points ++;
+	}
+	if (line_segments_intersect_at(&a_c, line_segment, &intersection_point))
+	{
+		return_points->points[return_points->num_points] = (vector_2D_t *)malloc(sizeof(vector_2D_t));
+		return_points->points[return_points->num_points]->x = intersection_point.x;
+		return_points->points[return_points->num_points]->y = intersection_point.y;
+		return_points->num_points ++;
+	}
+	if (line_segments_intersect_at(&b_d, line_segment, &intersection_point))
+	{
+		return_points->points[return_points->num_points] = (vector_2D_t *)malloc(sizeof(vector_2D_t));
+		return_points->points[return_points->num_points]->x = intersection_point.x;
+		return_points->points[return_points->num_points]->y = intersection_point.y;
+		return_points->num_points ++;
+	}
+	if (line_segments_intersect_at(&c_d, line_segment, &intersection_point))
+	{
+		return_points->points[return_points->num_points] = (vector_2D_t *)malloc(sizeof(vector_2D_t));
+		return_points->points[return_points->num_points]->x = intersection_point.x;
+		return_points->points[return_points->num_points]->y = intersection_point.y;
+		return_points->num_points ++;
+	}
+
+	oassert(return_points->num_points <= 2);
+
+	if(return_points->num_points == 0)
+	{
+		/* clean up if no intersections */
+		free(return_points->points);
+		free(return_points);
+		return_points = NULL;
+	}
+
+	return return_points;
+}

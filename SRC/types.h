@@ -65,6 +65,7 @@ typedef struct rectangle_t_t rectangle_t;
 typedef struct oriented_rectangle_t_t oriented_rectangle_t;
 typedef struct circle_t_t circle_t;
 typedef struct range_t_t range_t;
+typedef struct points_t_t points_t;
 
 
 
@@ -126,6 +127,7 @@ struct actuator_t_t
 struct agent_t_t 
 {
 	agent_group_t *agent_group; // back pointer to description of agent
+	short not_physical_agent; // for overlords and other agents of this type
 
 	/* personal state */
 	double angle; // assuming in radians where 0 degrees is North and south is "pi" = 3.14
@@ -264,6 +266,12 @@ struct range_t_t
 {
 	double minimum;
 	double maximum;
+};
+
+struct points_t_t
+{
+	int num_points;
+	vector_2D_t **points;
 };
 
 #endif // TYPES_H

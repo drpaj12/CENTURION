@@ -28,6 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define SENSORS_H
 
 #include "types.h"
+#include "control_sensors_actuators.h"
 
 void* run_sensor(
 		sensor_t *sensor,
@@ -35,6 +36,7 @@ void* run_sensor(
 		double current_time
 	);
 void setup_function_for_sensor(sensor_t *sensor, char *function_name);
+beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_reading, agent_t *agent_self, double x, double y, double beam_distance, double angle_radians);
 
 #endif
 
