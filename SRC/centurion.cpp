@@ -35,6 +35,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "argparse.hpp"
 #include "read_xml_config_file.h"
 #include "simulation.h"
+#include "log_file_xml.h"
 
 /* globals */
 global_args_t global_args;
@@ -75,6 +76,9 @@ int main(int argc, char **argv)
 	rand_float_seed(sim_system.rand_seed);
 	printf("rand seed: %d\n", sim_system.rand_seed);
 
+	/* start log file */
+	sim_system.output_log_tab_step = output_log_file_xml_header();
+
 	/* ---- BASIC Sequential GA Executions ---- */
 	if (strcmp(sim_system.simulation_type, "discrete") == 0)
 	{
@@ -89,6 +93,9 @@ int main(int argc, char **argv)
 	{
 		printf("Unsupported simulation type\n");
 	}
+
+	/* end log file */
+	output_log_file_xml_footer(sim_system.output_log_tab_step);
 
 	/*-------------------FREE_PROBLEM------------------*/
 	/* free the problem */

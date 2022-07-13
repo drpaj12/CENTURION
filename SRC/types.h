@@ -188,6 +188,7 @@ struct sim_system_t_t
 	FILE *Fdebug_out;
 	char *sim_log_file_out;
 	FILE *Fsim_log_out;
+	int output_log_tab_step;
 	char *simulation_type;
 };
 

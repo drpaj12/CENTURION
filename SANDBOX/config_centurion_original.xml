@@ -16,18 +16,18 @@
 			<num_objects>2</num_objects>
 			<object>
 				<circle>
-					<x>0.5</x>
-					<y>0.23</y>
-					<radius>0.23</radius>
+					<x>1.5</x>
+					<y>1.5</y>
+					<radius>0.1</radius>
 				</circle>
 			</object>
 			<object>
 				<rectangle>
-					<center_x>0.1</center_x>
-					<center_y>0.1</center_y>
-					<halfExtend_x>0.3</halfExtend_x>
-					<halfExtend_y>0.3</halfExtend_y>
-					<rotation>0.1</rotation>
+					<center_x>1.0</center_x>
+					<center_y>1.0</center_y>
+					<halfExtend_x>0.5</halfExtend_x>
+					<halfExtend_y>0.1</halfExtend_y>
+					<rotation>45</rotation>
 				</rectangle>
 			</object>
 		</objects>
@@ -51,15 +51,15 @@
 				     Also, note, code is not smart and expects, <x> then <y> then <angle> ... angle MUST be last -->
 				<list>
 					<x>0.4</x><y>0.4</y><angle>0</angle>
-					<x>1.0</x><y>1.0</y><angle>0</angle>
+					<x>0.9</x><y>1.0</y><angle>0</angle>
 				</list>
 			</initialization_of_agents>
 			<!-- robots are currently spheres, x1 and y1 don't matter -->
 			<object>
 				<circle>
-					<x>0.5</x>
-					<y>0.23</y>
-					<radius>0.23</radius>
+					<x>0.0</x>
+					<y>0.0</y>
+					<radius>0.05</radius>
 				</circle>
 			</object>
 			<sensors>

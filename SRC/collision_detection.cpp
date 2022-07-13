@@ -1107,19 +1107,32 @@ points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment,
 {
 	/* rectangles points    a b
 	 * 			c d */
+	double radian = degrees_to_radian(rectangle->rotation);
+	double sine = sinf(radian);
+	double cosine = cosf(radian);
+	double cx = rectangle->center.x;
+	double cy = rectangle->center.y;
+	double x0 = cx - rectangle->halfExtend.x;
+	double y0 = cy + rectangle->halfExtend.y;
 	vector_2D_t a;
-	a.x = rectangle->center.x - rectangle->halfExtend.x;
-	a.y = rectangle->center.y + rectangle->halfExtend.y;
+	a.x = cx + cosine*(x0 - cx) - sine*(y0 - cy);
+	a.y = cy + sine*(x0 - cx) + cosine*(y0 - cy);
+	double x1 = cx + rectangle->halfExtend.x;
+	double y1 = cy + rectangle->halfExtend.y;
 	vector_2D_t b;
-	a.x = rectangle->center.x + rectangle->halfExtend.x;
-	a.y = rectangle->center.y + rectangle->halfExtend.y;
+	b.x = cx + cosine*(x1 - cx) - sine*(y1 - cy);
+	b.y = cy + sine*(x1 - cx) + cosine*(y1 - cy);
+	double x2 = cx + rectangle->halfExtend.x;
+	double y2 = cy - rectangle->halfExtend.y;
 	vector_2D_t c;
-	a.x = rectangle->center.x - rectangle->halfExtend.x;
-	a.y = rectangle->center.y - rectangle->halfExtend.y;
+	c.x = cx + cosine*(x2 - cx) - sine*(y2 - cy);
+	c.y = cy + sine*(x2 - cx) + cosine*(y2 - cy);
+	double x3 = cx - rectangle->halfExtend.x;
+	double y3 = cy - rectangle->halfExtend.y;
 	vector_2D_t d;
-	a.x = rectangle->center.x + rectangle->halfExtend.x;
-	a.y = rectangle->center.y - rectangle->halfExtend.y;
-
+	d.x = cx + cosine*(x3 - cx) - sine*(y3 - cy);
+	d.y = cy + sine*(x3 - cx) + cosine*(y3 - cy);
+	
 	/* create line segments of rectangle */
 	line_segment_t a_b;
 	a_b.point1.x = a.x;

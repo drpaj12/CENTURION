@@ -31,6 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "globals.h"
 #include "utils.h"
 #include "robot_control.h"
+#include "log_file_xml.h"
 
 /* globals */
 sim_obj_t **sim_objects;
@@ -114,17 +115,20 @@ void simulation_loop()
 		/* check for crashes */
 
 		/* update world */
+		sim_system.output_log_tab_step = output_log_file_xml_time_step_start(sim_system.output_log_tab_step, current_time);
 		for (i = 0; i < num_sim_objects; i++)
 		{
 			if (sim_objects[i]->type == OBJECT)
 			{
 				continue;
 			}
-			else if (sim_objects[i]->type == AGENT)
+			else if (sim_objects[i]->type == AGENT && sim_objects[i]->agent->not_physical_agent == FALSE)
 			{
-				fprintf(sim_system.Fsim_log_out, "time:%f - %d - x:%f, y:%f, angle:%f, angle_d:%f\n", current_time, i, sim_objects[i]->agent->circle->center.x, sim_objects[i]->agent->circle->center.y, sim_objects[i]->agent->angle, sim_objects[i]->agent->angle * (180.0 / PI));
+				sim_system.output_log_tab_step = output_log_file_xml_time_step_agent(sim_system.output_log_tab_step, i, sim_objects[i]->agent->circle->center.x, sim_objects[i]->agent->circle->center.y, sim_objects[i]->agent->angle);
+//				fprintf(sim_system.Fsim_log_out, "time:%f - %d - x:%f, y:%f, angle:%f, angle_d:%f\n", current_time, i, sim_objects[i]->agent->circle->center.x, sim_objects[i]->agent->circle->center.y, sim_objects[i]->agent->angle, sim_objects[i]->agent->angle * (180.0 / PI));
 			}
 		}
+		sim_system.output_log_tab_step = output_log_file_xml_time_step_stop(sim_system.output_log_tab_step);
 
 		/* check for exit */
 		if (environment.sim_time_s < current_time)

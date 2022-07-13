@@ -157,7 +157,7 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 				printf("BEAM HIT CIRCLE(%f, %f, %f)\n", circle->center.x, circle->center.y, circle->radius);
 				for (j = 0; j < points_of_intersect->num_points; j++)
 				{
-					printf("	POINT %d -> x=%f y=%f\n", i, points_of_intersect->points[i]->x, points_of_intersect->points[i]->y);
+					printf("	POINT %d -> x=%f y=%f\n", j, points_of_intersect->points[j]->x, points_of_intersect->points[j]->y);
 				}
 
 			}
@@ -190,9 +190,9 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 						rectangle->center.x + rectangle->halfExtend.x,
 						rectangle->center.y - rectangle->halfExtend.y);
 
-				for (i = 0; i < points_of_intersect->num_points; i++)
+				for (j = 0; j < points_of_intersect->num_points; j++)
 				{
-					printf("	POINT %d -> x=%f y=%f\n", i, points_of_intersect->points[i]->x, points_of_intersect->points[i]->y);
+					printf("	POINT %d -> x=%f y=%f\n", j, points_of_intersect->points[j]->x, points_of_intersect->points[j]->y);
 				}
 			}
 		}
@@ -224,16 +224,10 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 			else if (points_of_intersect->num_points == 1)
 			{
 				double d0 = vector_length(points_of_intersect->points[0]);
-				double d1 = vector_length(points_of_intersect->points[1]);
 	
-				if (d0 < min_distance && d0 < d1)
+				if (d0 < min_distance)
 				{
 					min_distance = d0;
-					closest_obj = potential_closest;
-				}
-				else if (d1 < min_distance)
-				{
-					min_distance = d1;
 					closest_obj = potential_closest;
 				}
 	
