@@ -6,28 +6,82 @@ import random, time
 from bs4 import BeautifulSoup
 import lxml
 import math
+import pygame_COLORS
+
+# pygame colors: https://www.webucator.com/article/python-color-constants-module/
 
 
 def draw_agent(surface, color, x, y, radius, color_line, angle):
     pygame.gfxdraw.aacircle(surface, x, y, radius, color)
     pygame.gfxdraw.filled_circle(surface, x, y, radius, color)
     rad_angle = math.radians(angle)
-    pygame.gfxdraw.line(surface, x, y, x + int(radius * math.cos(rad_angle)), y + int(radius * math.sin(rad_angle)), color_line)
+    # y - sin -> since from center out and going ccw 
+    pygame.gfxdraw.line(surface, x, y, x + int(radius * math.cos(rad_angle)), y - int(radius * math.sin(rad_angle)), color_line)
 
 def draw_circle(surface, color, x, y, radius):
     pygame.gfxdraw.aacircle(surface, x, y, radius, color)
     #pygame.gfxdraw.filled_circle(surface, x, y, radius, color)
 
-def to_pygame(coords, height):
-    """Convert coordinates into pygame coordinates (lower-left => top left)."""
-    return (coords[0], height - coords[1])
-def to_pygame_x(x, width):
-    return width - x
 def to_pygame_y(y, height):
     return height - y
-def to_pygame(coords, height, obj_height):
-    """Convert an object's coords into pygame coordinates (lower-left of object => top left in pygame coords)."""
-    return (coords[0], height - coords[1] - obj_height)
+def transform_x(x, scale_factor, display_edge):
+    """Convert x coordinate with scale factor """
+    return (int(x*scale_factor)+display_edge)
+def reverse_transform_x(x, scale_factor, display_edge):
+    return (float((x-display_edge)/scale_factor))
+def transform_y(y, scale_factor, display_edge, flip_height):
+    """Convert y coordinate with scale factor, edge, and flip """
+    returny = y * scale_factor
+    returny = returny + display_edge
+    returny = int(to_pygame_y(returny, flip_height))
+    return (returny)
+def reverse_transform_y(y, scale_factor, display_edge, flip_height):
+    """Convert y coordinate with scale factor, edge, and flip """
+    returny = to_pygame_y(y, flip_height)
+    returny = returny - display_edge
+    returny = returny / scale_factor
+    return (returny)
+
+#Creating colors
+BLUE  = (0, 0, 255)
+RED   = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+SURFACE_COLOR = (255, 255, 255)#(167, 255, 100)
+COLOR = (255, 100, 98)
+
+#Other Variables for use in the program
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
+# add 10 surrounding space
+DISPLAY_EDGE = 10
+
+#Initialzing 
+pygame.init()
+
+size = (SCREEN_WIDTH, SCREEN_HEIGHT)
+screen = pygame.display.set_mode(size)
+
+#Setting up FPS 
+FPS = 60
+FramePerSec = pygame.time.Clock()
+
+#Setting up Sprites        
+all_sprites_list = pygame.sprite.Group()
+
+
+# Object class
+class circle_static(pygame.sprite.Sprite):
+    def __init__(self, color, x, y, radius):
+        super().__init__()
+
+        # need to make surface big enough for circle
+        self.image = pygame.Surface((2*radius+10, 2*radius+10), pygame.SRCALPHA)
+        self.color = color
+        self.x = x
+        self.y = y
 
 #Creating colors
 BLUE  = (0, 0, 255)
@@ -121,10 +175,8 @@ for i in range(0, len(circles)):
 
     #print("b_cs->"+str(x)+":"+str(y)+":"+str(radius));
     # SCALE and FLIP X
-    x = int(x*scale_factor)+DISPLAY_EDGE
-    y = y*scale_factor
-    y = y + DISPLAY_EDGE
-    y = int(to_pygame_y(y, SCREEN_HEIGHT))
+    x = transform_x(x, scale_factor, DISPLAY_EDGE)
+    y = transform_y(y, scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT) 
     radius = int(radius*scale_factor)
     # sprites added at x,y is top corner, so -radius to make centered
     x = x - radius
@@ -137,7 +189,7 @@ for i in range(0, len(circles)):
 
     all_sprites_list.add(object_)
 
-print(circle_list)
+#print(circle_list)
 
 rectangles = result.find_all('rectangle')
 rectangle_list = []
@@ -196,14 +248,19 @@ for i in range(0, len(rectangles)):
     #print("rs->"+str(rx0)+":"+str(ry0)+":"+str(rx1)+":"+str(ry1)+":"+str(rx2)+":"+str(ry2)+":"+str(rx3)+":"+str(ry3))
     rectangle_draw_list.append((rx0, ry0, rx1, ry1, rx2, ry2, rx3, ry3))
 
-print(rectangle_list)
+#print(rectangle_list)
 
 time_step = soup.find_all('time_step')
 agent_list = []
+sensor_hit_list = []
 agent_sprites = []
 for i in range(0, len(time_step)):
-    agents = time_step[i].find_all('agent')
+    # make second dimension empty
     agent_list.append([])
+    sensor_hit_list.append([])
+
+    # deal with agents
+    agents = time_step[i].find_all('agent')
     for j in range(0, len(agents)):
         x = float(agents[j].find('x').text)
         y = float(agents[j].find('y').text)
@@ -211,10 +268,8 @@ for i in range(0, len(time_step)):
         radius = int(agent_radius*scale_factor)
 
         # SCALE and FLIP Y
-        x = int(x*scale_factor)+DISPLAY_EDGE
-        y = y*scale_factor
-        y = y + DISPLAY_EDGE
-        y = int(to_pygame_y(y, SCREEN_HEIGHT))
+        x = transform_x(x, scale_factor, DISPLAY_EDGE)
+        y = transform_y(y, scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)
         # sprites added at x,y is top corner, so -radius to make centered
         x = x - radius
         y = y - radius
@@ -232,7 +287,29 @@ for i in range(0, len(time_step)):
             all_sprites_list.add(object_)
             agent_sprites.append(object_)
 
-print(agent_list)
+    # deal with sensor hits
+    hits = time_step[i].find_all('sensor_beam')
+    for j in range(0, len(hits)):
+        beam_x1 = float(hits[j].find('beam_x1').text)
+        beam_y1 = float(hits[j].find('beam_y1').text)
+        beam_x2 = float(hits[j].find('beam_x2').text)
+        beam_y2 = float(hits[j].find('beam_y2').text)
+        point_intersect_x = float(hits[j].find('point_intersect_x').text)
+        point_intersect_y = float(hits[j].find('point_intersect_y').text)
+
+        # SCALE and FLIP Y
+        beam_x1 = transform_x(beam_x1, scale_factor, DISPLAY_EDGE)
+        beam_y1 = transform_y(beam_y1, scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)
+        beam_x2 = transform_x(beam_x2, scale_factor, DISPLAY_EDGE)
+        beam_y2 = transform_y(beam_y2, scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)
+        point_intersect_x = transform_x(point_intersect_x, scale_factor, DISPLAY_EDGE)
+        point_intersect_y = transform_y(point_intersect_y, scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)
+
+        # store the hit data
+        sensor_hit_list[i].append((beam_x1, beam_y1, beam_x2, beam_y2, point_intersect_x, point_intersect_y))
+
+#print(sensor_hit_list)
+#print(agent_list)
 
 exit = True
 clock = pygame.time.Clock()
@@ -264,7 +341,6 @@ while exit:
             if event.key == pygame.K_n:
                 step_size = -step_size
             if event.key == pygame.K_SPACE:
-                print("Next Frame")
                 if current_step == last_step:
                     current_step = last_step
                 elif current_step + step_size > last_step:
@@ -273,8 +349,9 @@ while exit:
                     current_step = current_step + step_size
                     
                 print("Current_step:"+str(current_step))
+
                 for i in range(0, len(agent_sprites)):
-                    print(str(agent_list[current_step][i][0])+':'+str(agent_list[current_step][i][1])+':'+str(agent_list[current_step][i][2]));
+                    #print(str(agent_list[current_step][i][0])+':'+str(agent_list[current_step][i][1])+':'+str(agent_list[current_step][i][2]));
                     agent_sprites[i].rect.x = agent_list[current_step][i][0]
                     agent_sprites[i].rect.y = agent_list[current_step][i][1]
                     agent_sprites[i].change_angle(agent_list[current_step][i][2])
@@ -286,6 +363,20 @@ while exit:
     pygame.draw.polygon(screen, BLACK, ((DISPLAY_EDGE, DISPLAY_EDGE), (DISPLAY_EDGE, SCREEN_HEIGHT-DISPLAY_EDGE), (SCREEN_WIDTH-DISPLAY_EDGE, SCREEN_HEIGHT-DISPLAY_EDGE), (SCREEN_WIDTH-DISPLAY_EDGE, DISPLAY_EDGE)), 2)
 
     all_sprites_list.draw(screen)
+
+    # if there is a sensor hit
+    if sensor_hit_list[current_step]:
+        for i in range(0, len(sensor_hit_list[current_step])):
+            print(str(sensor_hit_list[current_step][i]))
+            print(str(rectangle_draw_list[0]))
+            print(str(reverse_transform_x(rectangle_draw_list[0][0], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(rectangle_draw_list[0][1], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
+            print(str(reverse_transform_x(rectangle_draw_list[0][2], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(rectangle_draw_list[0][3], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
+            print(str(reverse_transform_x(rectangle_draw_list[0][4], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(rectangle_draw_list[0][5], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
+            print(str(reverse_transform_x(rectangle_draw_list[0][6], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(rectangle_draw_list[0][7], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
+            print(str(reverse_transform_x(sensor_hit_list[current_step][i][4], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(sensor_hit_list[current_step][i][5], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
+
+            pygame.gfxdraw.line(screen, sensor_hit_list[current_step][i][0], sensor_hit_list[current_step][i][1], sensor_hit_list[current_step][i][2], sensor_hit_list[current_step][i][3], pygame_COLORS.VIOLETRED2)
+            pygame.draw.circle(screen, pygame_COLORS.VIOLETRED2, (sensor_hit_list[current_step][i][4], sensor_hit_list[current_step][i][5]), 2)
 
     # draw static rectangles
     for i in range(0, len(rectangle_draw_list)):

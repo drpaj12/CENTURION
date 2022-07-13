@@ -52,22 +52,20 @@ void* sensor_function_IDEAL_BEAM(sensor_t *sensor, agent_t *agent, double curren
 	beam_sensor_t *sensor_reading;
 	sensor_state_t* sensor_state;
 
-	if (sensor->initialized == FALSE)
+	if (agent->sensor_memories[sensor->sensor_idx] == NULL)
 	{	
-		sensor->initialized = TRUE;
-
 		sensor_state = (sensor_state_t*)malloc(sizeof(sensor_state_t));
 		sensor_state->sense_completed_in_s = 0;
 		sensor_reading = (beam_sensor_t*)malloc(sizeof(beam_sensor_t));
 		sensor_state->sensor_reading = sensor_reading;
 
 		/* store as memory */
-		sensor->general_memory = (void*)sensor_state;
+		agent->sensor_memories[sensor->sensor_idx] = (void*)sensor_state;
 	}
 	else
 	{
 		/* extract memory */
-		sensor_state = (sensor_state_t*)(sensor->general_memory);
+		sensor_state = (sensor_state_t*)(agent->sensor_memories[sensor->sensor_idx]);
 		sensor_reading = sensor_state->sensor_reading;
 	}
 

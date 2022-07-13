@@ -52,7 +52,7 @@ void read_config_file(char *config_file_name)
 {
 	xmlDocPtr doc;
 	xmlNodePtr top_xmlptr;
-	int i;
+	int i, j;
 
 	doc = xmlParseFile(config_file_name);
 	
@@ -315,6 +315,17 @@ void read_config_file(char *config_file_name)
 									for (i = 0; i < agent_groups.agent_group[agent_group_idx]->num_sensors; i++)
 									{
 										agent_groups.agent_group[agent_group_idx]->sensors[i] = (sensor_t*)malloc(sizeof(sensor_t));
+										agent_groups.agent_group[agent_group_idx]->sensors[i]->sensor_idx = i;
+									}
+
+									for (i = 0; i < agent_groups.agent_group[agent_group_idx]->num_agents; i++)
+									{
+										/* allocate the sensor memory per agent */
+										agent_groups.agent_group[agent_group_idx]->agents[i]->sensor_memories = (void**)malloc(sizeof(void*)*agent_groups.agent_group[agent_group_idx]->num_sensors);
+										for (j = 0; j < agent_groups.agent_group[agent_group_idx]->num_sensors; j++)
+                                                                        	{
+											agent_groups.agent_group[agent_group_idx]->agents[i]->sensor_memories[j] = NULL;
+										}
 									}
 									sensor_idx = 0;
 

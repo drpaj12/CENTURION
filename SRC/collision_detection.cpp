@@ -802,6 +802,24 @@ vector_2D_t project_vector( vector_2D_t* project,  vector_2D_t* onto)
 }
 
 /*---------------------------------------------------------------------------------------------
+ * (function: segment_length)
+ *-------------------------------------------------------------------------------------------*/
+double segment_length(line_segment_t* a)
+{
+	return (sqrt((a->point1.x-a->point2.x)*(a->point1.x-a->point2.x)+(a->point1.y-a->point2.y)*(a->point1.y-a->point2.y)));
+}
+/*---------------------------------------------------------------------------------------------
+ * (function: segment_length)
+ *-------------------------------------------------------------------------------------------*/
+double two_points_distance(vector_2D_t* a, vector_2D_t* b)
+{
+	return (sqrt((a->x-b->x)*(a->x-b->x)+(a->y-b->y)*(a->y-b->y)));
+}
+
+
+
+
+/*---------------------------------------------------------------------------------------------
  * (function: enlarge_rectangle_point)
  *-------------------------------------------------------------------------------------------*/
 rectangle_t enlarge_rectangle_point( rectangle_t* r,  vector_2D_t* p)
@@ -1061,10 +1079,48 @@ points_t *segment_intersects_circle_at(line_segment_t *line_segment, circle_t *c
    Return FALSE if the lines don't intersect
 */
 short line_segments_intersect_at(line_segment_t *A, line_segment_t *B, vector_2D_t *intersection) 
+//int get_line_intersection(float p0_x, float p0_y, float p1_x, float p1_y, 
+//   float p2_x, float p2_y, float p3_x, float p3_y, float *i_x, float *i_y)
+{
+	double s02_x, s02_y, s10_x, s10_y, s32_x, s32_y, s_numer, t_numer, denom, t;
+	s10_x = A->point2.x - A->point1.x;
+	s10_y = A->point2.y - A->point1.y;
+	s32_x = B->point2.x - B->point1.x;
+	s32_y = B->point2.y - B->point1.y;
+	
+	denom = s10_x * s32_y - s32_x * s10_y;
+	if (denom == 0)
+		return FALSE; // Collinear
+	
+	short denomPositive = denom > 0;
+	
+	s02_x = A->point1.x - B->point1.x;
+	s02_y = A->point1.y - B->point1.y;
+	
+	s_numer = s10_x * s02_y - s10_y * s02_x;
+	if ((s_numer < 0) == denomPositive)
+		return FALSE; // No collision
+	
+	t_numer = s32_x * s02_y - s32_y * s02_x;
+	if ((t_numer < 0) == denomPositive)
+		return FALSE; // No collision
+	
+	if (((s_numer > denom) == denomPositive) || ((t_numer > denom) == denomPositive))
+		return FALSE; // No collision
+	
+	// Collision detected
+	t = t_numer / denom;
+	intersection->x = A->point1.x + (t * s10_x);
+	intersection->y = A->point1.y + (t * s10_y);
+
+	return TRUE;
+}
+
+short line_segments_intersect_at_old(line_segment_t *A, line_segment_t *B, vector_2D_t *intersection) 
 {
 	double mua,mub;
 	double denom,numera,numerb;
-	double epsilon = 1.0f / 8192.0f;/* should be small eFALSEugh for 1.0f == pixel width */
+	double epsilon = 1.0f / 8192.0f;/* should be small enough for 1.0f == pixel width */
 
 	denom  = (B->point2.y-B->point1.y) * (A->point2.x-A->point1.x) - (B->point2.x-B->point1.x) * (A->point2.y-A->point1.y);
 	numera = (B->point2.x-B->point1.x) * (A->point1.y-B->point1.y) - (B->point2.y-B->point1.y) * (A->point1.x-B->point1.x);
@@ -1101,12 +1157,12 @@ short line_segments_intersect_at(line_segment_t *A, line_segment_t *B, vector_2D
 }
 
 /*---------------------------------------------------------------------------------------------
- * (function: segment_intersects_oriented_rectangle_at) 
+ * (function: oriented_rectangle_to_points) 
  *-------------------------------------------------------------------------------------------*/
-points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment, oriented_rectangle_t *rectangle) 
+void oriented_rectangle_to_points(vector_2D_t *a, vector_2D_t *b, vector_2D_t *c, vector_2D_t *d, oriented_rectangle_t *rectangle) 
 {
 	/* rectangles points    a b
-	 * 			c d */
+	 * 			d c */
 	double radian = degrees_to_radian(rectangle->rotation);
 	double sine = sinf(radian);
 	double cosine = cosf(radian);
@@ -1114,24 +1170,34 @@ points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment,
 	double cy = rectangle->center.y;
 	double x0 = cx - rectangle->halfExtend.x;
 	double y0 = cy + rectangle->halfExtend.y;
-	vector_2D_t a;
-	a.x = cx + cosine*(x0 - cx) - sine*(y0 - cy);
-	a.y = cy + sine*(x0 - cx) + cosine*(y0 - cy);
+	a->x = cx + cosine*(x0 - cx) - sine*(y0 - cy);
+	a->y = cy + sine*(x0 - cx) + cosine*(y0 - cy);
 	double x1 = cx + rectangle->halfExtend.x;
 	double y1 = cy + rectangle->halfExtend.y;
-	vector_2D_t b;
-	b.x = cx + cosine*(x1 - cx) - sine*(y1 - cy);
-	b.y = cy + sine*(x1 - cx) + cosine*(y1 - cy);
+	b->x = cx + cosine*(x1 - cx) - sine*(y1 - cy);
+	b->y = cy + sine*(x1 - cx) + cosine*(y1 - cy);
 	double x2 = cx + rectangle->halfExtend.x;
 	double y2 = cy - rectangle->halfExtend.y;
-	vector_2D_t c;
-	c.x = cx + cosine*(x2 - cx) - sine*(y2 - cy);
-	c.y = cy + sine*(x2 - cx) + cosine*(y2 - cy);
+	c->x = cx + cosine*(x2 - cx) - sine*(y2 - cy);
+	c->y = cy + sine*(x2 - cx) + cosine*(y2 - cy);
 	double x3 = cx - rectangle->halfExtend.x;
 	double y3 = cy - rectangle->halfExtend.y;
+	d->x = cx + cosine*(x3 - cx) - sine*(y3 - cy);
+	d->y = cy + sine*(x3 - cx) + cosine*(y3 - cy);
+}
+
+/*---------------------------------------------------------------------------------------------
+ * (function: segment_intersects_oriented_rectangle_at) 
+ *-------------------------------------------------------------------------------------------*/
+points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment, oriented_rectangle_t *rectangle) 
+{
+	/* rectangles points    a b
+	 * 			d c */
+	vector_2D_t a;
+	vector_2D_t b;
+	vector_2D_t c;
 	vector_2D_t d;
-	d.x = cx + cosine*(x3 - cx) - sine*(y3 - cy);
-	d.y = cy + sine*(x3 - cx) + cosine*(y3 - cy);
+	oriented_rectangle_to_points(&a, &b, &c, &d, rectangle);
 	
 	/* create line segments of rectangle */
 	line_segment_t a_b;
@@ -1139,16 +1205,16 @@ points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment,
 	a_b.point1.y = a.y;
 	a_b.point2.x = b.x;
 	a_b.point2.y = b.y;
-	line_segment_t a_c;
-	a_c.point1.x = a.x;
-	a_c.point1.y = a.y;
-	a_c.point2.x = c.x;
-	a_c.point2.y = c.y;
-	line_segment_t b_d;
-	b_d.point1.x = b.x;
-	b_d.point1.y = b.y;
-	b_d.point2.x = d.x;
-	b_d.point2.y = d.y;
+	line_segment_t a_d;
+	a_d.point1.x = a.x;
+	a_d.point1.y = a.y;
+	a_d.point2.x = d.x;
+	a_d.point2.y = d.y;
+	line_segment_t b_c;
+	b_c.point1.x = b.x;
+	b_c.point1.y = b.y;
+	b_c.point2.x = c.x;
+	b_c.point2.y = c.y;
 	line_segment_t c_d;
 	c_d.point1.x = c.x;
 	c_d.point1.y = c.y;
@@ -1169,14 +1235,14 @@ points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment,
 		return_points->points[return_points->num_points]->y = intersection_point.y;
 		return_points->num_points ++;
 	}
-	if (line_segments_intersect_at(&a_c, line_segment, &intersection_point))
+	if (line_segments_intersect_at(&a_d, line_segment, &intersection_point))
 	{
 		return_points->points[return_points->num_points] = (vector_2D_t *)malloc(sizeof(vector_2D_t));
 		return_points->points[return_points->num_points]->x = intersection_point.x;
 		return_points->points[return_points->num_points]->y = intersection_point.y;
 		return_points->num_points ++;
 	}
-	if (line_segments_intersect_at(&b_d, line_segment, &intersection_point))
+	if (line_segments_intersect_at(&b_c, line_segment, &intersection_point))
 	{
 		return_points->points[return_points->num_points] = (vector_2D_t *)malloc(sizeof(vector_2D_t));
 		return_points->points[return_points->num_points]->x = intersection_point.x;

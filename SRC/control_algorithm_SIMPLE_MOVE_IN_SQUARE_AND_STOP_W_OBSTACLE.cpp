@@ -73,14 +73,17 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 	/* sensor reads -1 if no objects */
 	if (sensor_data->in_m > 0.0 && sensor_data->in_m < 0.05)
 	{
-		/* if in 5cm of an object need to stop and store current state */
-		((int*)(agent->general_memory))[0] = agent->CURRENT_STATE;
-	       	agent->CURRENT_STATE = S_STOP_OBJECT;	
-		/* tell robot to stop */
-		actuator_input.left = 0;
-		actuator_input.right = 0;
-		actuator_input.time_in_s = 0;
-		actuator_input.new_instruction = FALSE;
+		if (agent->CURRENT_STATE != S_START)
+		{	
+			/* if in 5cm of an object need to stop and store current state */
+			((int*)(agent->general_memory))[0] = agent->CURRENT_STATE;
+		       	agent->CURRENT_STATE = S_STOP_OBJECT;	
+			/* tell robot to stop */
+			actuator_input.left = 0;
+			actuator_input.right = 0;
+			actuator_input.time_in_s = 0;
+			actuator_input.new_instruction = FALSE;
+		}
 	}
 	else
 	{

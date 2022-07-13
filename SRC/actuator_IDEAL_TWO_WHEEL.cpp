@@ -129,11 +129,11 @@ void actuator_function_IDEAL_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act
 			case BACKWARDS:
 				move(agent, -(actuator_state->m_per_epoch));
 				break;
-			case LEFT: // counter clock wise
-				turn(agent, -(actuator_state->angle_per_epoch));
-				break;
-			case RIGHT: // clock wise
+			case LEFT: // counter clock wise = adding
 				turn(agent, actuator_state->angle_per_epoch);
+				break;
+			case RIGHT: // clock wise = sub
+				turn(agent, -(actuator_state->angle_per_epoch));
 				break;
 			default:
 				oassert(FALSE);

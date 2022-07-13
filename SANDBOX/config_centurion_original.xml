@@ -16,8 +16,8 @@
 			<num_objects>2</num_objects>
 			<object>
 				<circle>
-					<x>1.5</x>
-					<y>1.5</y>
+					<x>1.0</x>
+					<y>1.0</y>
 					<radius>0.1</radius>
 				</circle>
 			</object>

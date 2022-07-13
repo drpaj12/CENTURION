@@ -99,6 +99,9 @@ void simulation_loop()
 		/* update time */
 		current_time += environment.sim_time_computation_epoch_s;
 
+		/* start logging in file */
+		sim_system.output_log_tab_step = output_log_file_xml_time_step_start(sim_system.output_log_tab_step, current_time);
+
 		/* do processing of objects */
 		for (i = 0; i < num_sim_objects; i++)
 		{
@@ -115,7 +118,6 @@ void simulation_loop()
 		/* check for crashes */
 
 		/* update world */
-		sim_system.output_log_tab_step = output_log_file_xml_time_step_start(sim_system.output_log_tab_step, current_time);
 		for (i = 0; i < num_sim_objects; i++)
 		{
 			if (sim_objects[i]->type == OBJECT)

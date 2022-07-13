@@ -34,6 +34,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 #include "control_sensors_actuators.h"
 #include "collision_detection.h"
+#include "log_file_xml.h"
 
 /* globals */
 int num_sensor_names = 3; // number of strings below and in enum
@@ -110,6 +111,7 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 
 	printf("sensor_beam line_segemnt -> x=%f y=%f to x1=%f y=%f\n", start_point.x, start_point.y, end_point.x, end_point.y);
 
+	vector_2D_t point_of_intersect;
 	sim_obj_t *closest_obj = NULL;
 	double min_distance = 2*beam_distance;
 
@@ -154,6 +156,7 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 			}
 			else
 			{
+
 				printf("BEAM HIT CIRCLE(%f, %f, %f)\n", circle->center.x, circle->center.y, circle->radius);
 				for (j = 0; j < points_of_intersect->num_points; j++)
 				{
@@ -166,30 +169,19 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 		{
 			points_of_intersect = segment_intersects_oriented_rectangle_at(&beam_segment, rectangle);
 
+			vector_2D_t a;
+			vector_2D_t b;
+			vector_2D_t c;
+			vector_2D_t d;
+			oriented_rectangle_to_points(&a, &b, &c, &d, rectangle);
+
 			if (points_of_intersect == NULL)
 			{
-				printf("NO BEAM HIT on RECTANGLE ((%f,%f), (%f,%f), (%f,%f), (%f,%f))\n", 
-						rectangle->center.x - rectangle->halfExtend.x,
-						rectangle->center.y + rectangle->halfExtend.y,
-						rectangle->center.x + rectangle->halfExtend.x,
-						rectangle->center.y + rectangle->halfExtend.y,
-						rectangle->center.x - rectangle->halfExtend.x,
-						rectangle->center.y - rectangle->halfExtend.y,
-						rectangle->center.x + rectangle->halfExtend.x,
-						rectangle->center.y - rectangle->halfExtend.y);
+				printf("NO BEAM HIT on RECTANGLE ((%f,%f), (%f,%f), (%f,%f), (%f,%f))\n", a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
 			}
 			else
 			{
-				printf("BEAM HIT on RECTANGLE ((%f,%f), (%f,%f), (%f,%f), (%f,%f))\n", 
-						rectangle->center.x - rectangle->halfExtend.x,
-						rectangle->center.y + rectangle->halfExtend.y,
-						rectangle->center.x + rectangle->halfExtend.x,
-						rectangle->center.y + rectangle->halfExtend.y,
-						rectangle->center.x - rectangle->halfExtend.x,
-						rectangle->center.y - rectangle->halfExtend.y,
-						rectangle->center.x + rectangle->halfExtend.x,
-						rectangle->center.y - rectangle->halfExtend.y);
-
+				printf("BEAM HIT on RECTANGLE ((%f,%f), (%f,%f), (%f,%f), (%f,%f))\n", a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
 				for (j = 0; j < points_of_intersect->num_points; j++)
 				{
 					printf("	POINT %d -> x=%f y=%f\n", j, points_of_intersect->points[j]->x, points_of_intersect->points[j]->y);
@@ -202,18 +194,22 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 			/* see if this point is closer than previous ones */
 			if (points_of_intersect->num_points == 2)
 			{
-				double d0 = vector_length(points_of_intersect->points[0]);
-				double d1 = vector_length(points_of_intersect->points[1]);
+				double d0 = two_points_distance(points_of_intersect->points[0], &start_point);
+				double d1 = two_points_distance(points_of_intersect->points[1], &start_point);
 	
 				if (d0 < min_distance && d0 < d1)
 				{
 					min_distance = d0;
 					closest_obj = potential_closest;
+					point_of_intersect.x = points_of_intersect->points[0]->x;
+					point_of_intersect.y = points_of_intersect->points[0]->y;
 				}
 				else if (d1 < min_distance)
 				{
 					min_distance = d1;
 					closest_obj = potential_closest;
+					point_of_intersect.x = points_of_intersect->points[1]->x;
+					point_of_intersect.y = points_of_intersect->points[1]->y;
 				}
 	
 				free (points_of_intersect->points[0]);
@@ -223,12 +219,14 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 			}
 			else if (points_of_intersect->num_points == 1)
 			{
-				double d0 = vector_length(points_of_intersect->points[0]);
+				double d0 = two_points_distance(points_of_intersect->points[0], &start_point);
 	
 				if (d0 < min_distance)
 				{
 					min_distance = d0;
 					closest_obj = potential_closest;
+					point_of_intersect.x = points_of_intersect->points[0]->x;
+					point_of_intersect.y = points_of_intersect->points[0]->y;
 				}
 	
 				free (points_of_intersect->points[0]);
@@ -242,6 +240,8 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 	{
 		sensor_reading[0]->in_m = min_distance;
 		sensor_reading[0]->angle_phi = 0.0;
+		/* output sensor hit to log file */
+		sim_system.output_log_tab_step = output_log_file_xml_time_step_sensor_beam_hit(sim_system.output_log_tab_step, &beam_segment, &point_of_intersect);
 	}
 	else
 	{

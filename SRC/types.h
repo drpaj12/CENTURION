@@ -93,15 +93,13 @@ struct sim_obj_t
 /* ASSUMPTION - sensor mounted at very front of robot, Radius of robot */
 struct sensor_t_t 
 {
-	double angle; // <!-- assume 0 = 0 radian angle facing forward of robot, 1.57079 is facing East, and 3.14 is facing backwards (clockwise rotation) --> 
+	double angle; // <!-- assume 0 = 0 radian angle facing forward of robot, 1.57079 is facing East, and 3.14 is facing backwards (counter clockwise rotation) --> 
 	double sim_time_computation_epoch_s; // how fast the sensor reads
 
 	/* the function that returns void * data for what sensor sees */
 	void* (*fptr_sensor)(sensor_t *sensor, agent_t *agent, double current_time);
 
-	/* sensor internal sim state */
-	void *general_memory;
-	short initialized;
+	int sensor_idx;
 };
 
 /* inputs to an actuator */
@@ -130,10 +128,12 @@ struct agent_t_t
 	short not_physical_agent; // for overlords and other agents of this type
 
 	/* personal state */
-	double angle; // assuming in radians where 0 degrees is North and south is "pi" = 3.14
+	double angle; // assuming in radians where 0 degrees is East and West is "pi" = 3.14
 	circle_t *circle;
 	
 	void *general_memory;
+	void **sensor_memories;
+	void **actuator_memories;
 
 	int CURRENT_STATE;
 	double time_in_state;

@@ -34,6 +34,8 @@ points_t *segment_intersects_oriented_rectangle_at(line_segment_t *line_segment,
 
 short line_segments_intersect_at(line_segment_t *A, line_segment_t *B, vector_2D_t *intersection) ;
 
+void oriented_rectangle_to_points(vector_2D_t *a, vector_2D_t *b, vector_2D_t *c, vector_2D_t *d, oriented_rectangle_t *rectangle);
+
 short circles_collide( circle_t* a,  circle_t* b);
 short circle_point_collide( circle_t* c,  vector_2D_t* p);
 short circle_line_collide( circle_t* c,  line_t* l);
@@ -90,6 +92,9 @@ vector_2D_t rotate_vector_270( vector_2D_t* v);
 vector_2D_t unit_vector( vector_2D_t* v);
 double enclosed_angle( vector_2D_t* a,  vector_2D_t* b);
 vector_2D_t project_vector( vector_2D_t* project,  vector_2D_t* onto);
+double two_points_distance(vector_2D_t* a, vector_2D_t* b);
+double segment_length(line_segment_t* a);
+
 rectangle_t enlarge_rectangle_point( rectangle_t* r,  vector_2D_t* p);
 rectangle_t oriented_rectangle_rectangle_hull( oriented_rectangle_t* r);
 
