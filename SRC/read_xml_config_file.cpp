@@ -383,11 +383,19 @@ void read_config_file(char *config_file_name)
 									for (i = 0; i < agent_groups.agent_group[agent_group_idx]->num_actuators; i++)
 									{
 										agent_groups.agent_group[agent_group_idx]->actuators[i] = (actuator_t*)malloc(sizeof(actuator_t));
-										agent_groups.agent_group[agent_group_idx]->actuators[i]->general_memory = NULL; 
-										agent_groups.agent_group[agent_group_idx]->actuators[i]->initialized = FALSE;
+										agent_groups.agent_group[agent_group_idx]->actuators[i]->actuator_idx = i;
+									}
+
+									for (i = 0; i < agent_groups.agent_group[agent_group_idx]->num_agents; i++)
+									{
+										/* allocate the actuator memory per agent */
+										agent_groups.agent_group[agent_group_idx]->agents[i]->actuator_memories = (void**)malloc(sizeof(void*)*agent_groups.agent_group[agent_group_idx]->num_actuators);
+										for (j = 0; j < agent_groups.agent_group[agent_group_idx]->num_actuators; j++)
+                                                                        	{
+											agent_groups.agent_group[agent_group_idx]->agents[i]->actuator_memories[j] = NULL;
+										}
 									}
 									actuator_idx = 0;
-
 								}
 								else if ((!xmlStrcmp(actuators_xmlptr->name, (const xmlChar *)"actuator")))
 								{

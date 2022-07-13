@@ -61,12 +61,10 @@ void actuator_function_IDEAL_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act
 {
 	actuator_state_t* actuator_state;
 
-	printf("IDEAL_TWO WHEEL ACTUATOR called\n");
+	//printf("IDEAL_TWO WHEEL ACTUATOR called\n");
 
-	if (actuator->initialized == FALSE)
+	if (agent->actuator_memories[actuator->actuator_idx] == NULL)
 	{	
-		actuator->initialized = TRUE;
-
 		actuator_state = (actuator_state_t*)malloc(sizeof(actuator_state_t));
 		/* velocity is m/s and simulator epoch is a time smaller than seconds -> m/sim_epoch = VEL * sim_time_epoch */
 		actuator_state->m_per_epoch = VELOCITY_IN_M_PER_S * environment.sim_time_computation_epoch_s;
@@ -76,12 +74,12 @@ void actuator_function_IDEAL_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act
 		actuator_state->last_instruction_time_end = 0;
 
 		/* store as memory */
-		actuator->general_memory = (void*)actuator_state;
+		agent->actuator_memories[actuator->actuator_idx] = (void*)actuator_state;
 	}
 	else
 	{
 		/* extract memory */
-		actuator_state = (actuator_state_t*)(actuator->general_memory);
+		actuator_state = (actuator_state_t*)(agent->actuator_memories[actuator->actuator_idx]);
 	}
 
 	if (inputs->new_instruction == TRUE)

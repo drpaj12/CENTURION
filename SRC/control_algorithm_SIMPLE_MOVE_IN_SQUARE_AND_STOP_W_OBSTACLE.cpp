@@ -60,15 +60,15 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 	act_inputs_t actuator_input;
 
 	/* with STATE being very big - S_START is STATE 0 */
-	enum states {S_START, S_START_FORWARD, S_FORWARD, S_START_TURN_LEFT, S_TURN_LEFT, S_STOP_OBJECT};
+	enum states {S_START, S_START_FORWARD, S_FORWARD, S_START_TURN_LEFT, S_TURN_LEFT, S_STOP_OBJECT, S_TURN_RIGHT, S_START_RIGHT_FROM_STOP};
 
-	printf("SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE called\n");
+	//printf("SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE called\n");
 
 	/* read sensor two check if something is 5cm away */
 	sensor_val = run_sensor(agent->agent_group->sensors[IDEAL_BEAM_SENSOR], agent, current_time);
 	sensor_data = (beam_sensor_t*)sensor_val;
 
-	printf("sensor reads %f meters\n", sensor_data->in_m);
+	//printf("sensor reads %f meters\n", sensor_data->in_m);
 
 	/* sensor reads -1 if no objects */
 	if (sensor_data->in_m > 0.0 && sensor_data->in_m < 0.05)
@@ -146,13 +146,36 @@ void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent,
 				else
 					agent->CURRENT_STATE = S_START_FORWARD;
 				break;
-			case S_STOP_OBJECT:
-				/* if back here then object no longer 5cm away */
+			case S_START_RIGHT_FROM_STOP:
+				agent->time_in_state = 0;	
+
+				/* actuator inputs */
+				actuator_input.left = 0;
+				actuator_input.right = 1;
+				actuator_input.time_in_s = TURN_TIME; // 9s at 10degrees per second = 90 degrees
+				actuator_input.new_instruction = TRUE;
+
+				agent->CURRENT_STATE = S_TURN_RIGHT;
+				break;
+			case S_TURN_RIGHT: 
+				agent->time_in_state += current_time - agent->last_time;	
 
 				/* actuator inputs */
 				actuator_input.new_instruction = FALSE;
 
-				agent->CURRENT_STATE = ((int*)(agent->general_memory))[0];
+				if (agent->time_in_state < TURN_TIME)
+					agent->CURRENT_STATE = S_TURN_RIGHT;
+				else
+					agent->CURRENT_STATE = S_START_FORWARD;
+				break;
+			case S_STOP_OBJECT:
+				/* if back here then object is 5cm away */
+
+				/* actuator inputs */
+				actuator_input.new_instruction = FALSE;
+
+				agent->CURRENT_STATE = S_START_RIGHT_FROM_STOP;
+
 				break;
 			default:
 				printf("Robot in unknown state\n");

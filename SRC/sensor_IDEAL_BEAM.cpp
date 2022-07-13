@@ -75,7 +75,8 @@ void* sensor_function_IDEAL_BEAM(sensor_t *sensor, agent_t *agent, double curren
 		sensor_state->sense_completed_in_s = current_time + sensor->sim_time_computation_epoch_s;
 
 		/* get current reading */
-		find_closest_object_on_beam_projection(&sensor_reading, agent, agent->circle->center.x, agent->circle->center.y, agent->circle->radius+.5, agent->angle);
+		//find_closest_object_on_beam_projection(&sensor_reading, agent, agent->circle->center.x, agent->circle->center.y, agent->circle->radius+.5, agent->angle);
+		find_closest_object_on_beam_projection(&sensor_reading, agent, agent->circle->center.x + (cos(agent->angle)*agent->circle->radius) , agent->circle->center.y + (sin(agent->angle)*agent->circle->radius), .5, agent->angle);
 		sensor_reading->new_data = TRUE;
 	}
 	else

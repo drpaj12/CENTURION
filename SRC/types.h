@@ -116,9 +116,7 @@ struct actuator_t_t
 {
 	void (*fptr_actuator)(actuator_t *actuator, agent_t *agent, act_inputs_t *values, double current_time);
 
-	/* actuator internal sim state */
-	void *general_memory;
-	short initialized;
+	int actuator_idx;
 };
 
 /* different types of agent */

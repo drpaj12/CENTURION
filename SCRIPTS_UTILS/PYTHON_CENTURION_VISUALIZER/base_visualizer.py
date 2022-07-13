@@ -147,7 +147,7 @@ class circle_agent(pygame.sprite.Sprite):
         self.angle = angle
         draw_agent(self.image, self.color, int(self.radius), int(self.radius), self.radius, self.line_color, self.angle)
 
-# read xml in
+# read xml in of log file
 infile = open("log_file.xml","r")
 contents = infile.read()
 soup = BeautifulSoup(contents,features='lxml')
@@ -188,7 +188,6 @@ for i in range(0, len(circles)):
     object_.rect.y = y
 
     all_sprites_list.add(object_)
-
 #print(circle_list)
 
 rectangles = result.find_all('rectangle')
@@ -247,7 +246,6 @@ for i in range(0, len(rectangles)):
     ry3 = int(to_pygame_y(ry3, SCREEN_HEIGHT))
     #print("rs->"+str(rx0)+":"+str(ry0)+":"+str(rx1)+":"+str(ry1)+":"+str(rx2)+":"+str(ry2)+":"+str(rx3)+":"+str(ry3))
     rectangle_draw_list.append((rx0, ry0, rx1, ry1, rx2, ry2, rx3, ry3))
-
 #print(rectangle_list)
 
 time_step = soup.find_all('time_step')
@@ -307,7 +305,6 @@ for i in range(0, len(time_step)):
 
         # store the hit data
         sensor_hit_list[i].append((beam_x1, beam_y1, beam_x2, beam_y2, point_intersect_x, point_intersect_y))
-
 #print(sensor_hit_list)
 #print(agent_list)
 
@@ -320,10 +317,13 @@ step_size = 0
 last_step = len(time_step) - 1
 
 while exit:
+
+    # CATCH events and deal with them
     for event in pygame.event.get():
         #print("an event->"+str(event))
         if event.type == pygame.QUIT:
             exit = False
+
         if event.type == KEYDOWN:
             if event.key == pygame.K_q:
                 print("Quit")
@@ -343,6 +343,10 @@ while exit:
             if event.key == pygame.K_SPACE:
                 if current_step == last_step:
                     current_step = last_step
+                elif current_step == 0:
+                    current_step = 0
+                elif current_step + step_size < 0:
+                    current_step = 0
                 elif current_step + step_size > last_step:
                     current_step = last_step
                 else:
@@ -355,34 +359,28 @@ while exit:
                     agent_sprites[i].rect.x = agent_list[current_step][i][0]
                     agent_sprites[i].rect.y = agent_list[current_step][i][1]
                     agent_sprites[i].change_angle(agent_list[current_step][i][2])
-    
 
     all_sprites_list.update()
     screen.fill(SURFACE_COLOR)
-    # draw sim box
+
+    # draw sim box which represents real space
     pygame.draw.polygon(screen, BLACK, ((DISPLAY_EDGE, DISPLAY_EDGE), (DISPLAY_EDGE, SCREEN_HEIGHT-DISPLAY_EDGE), (SCREEN_WIDTH-DISPLAY_EDGE, SCREEN_HEIGHT-DISPLAY_EDGE), (SCREEN_WIDTH-DISPLAY_EDGE, DISPLAY_EDGE)), 2)
 
+    # draw sprites
     all_sprites_list.draw(screen)
 
+    # DRAW sensor BEAMS
     # if there is a sensor hit
     if sensor_hit_list[current_step]:
         for i in range(0, len(sensor_hit_list[current_step])):
-            print(str(sensor_hit_list[current_step][i]))
-            print(str(rectangle_draw_list[0]))
-            print(str(reverse_transform_x(rectangle_draw_list[0][0], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(rectangle_draw_list[0][1], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
-            print(str(reverse_transform_x(rectangle_draw_list[0][2], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(rectangle_draw_list[0][3], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
-            print(str(reverse_transform_x(rectangle_draw_list[0][4], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(rectangle_draw_list[0][5], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
-            print(str(reverse_transform_x(rectangle_draw_list[0][6], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(rectangle_draw_list[0][7], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
-            print(str(reverse_transform_x(sensor_hit_list[current_step][i][4], scale_factor, DISPLAY_EDGE))+':'+ str(reverse_transform_y(sensor_hit_list[current_step][i][5], scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)))
-
             pygame.gfxdraw.line(screen, sensor_hit_list[current_step][i][0], sensor_hit_list[current_step][i][1], sensor_hit_list[current_step][i][2], sensor_hit_list[current_step][i][3], pygame_COLORS.VIOLETRED2)
             pygame.draw.circle(screen, pygame_COLORS.VIOLETRED2, (sensor_hit_list[current_step][i][4], sensor_hit_list[current_step][i][5]), 2)
 
+    # draw RECTANGLES
     # draw static rectangles
     for i in range(0, len(rectangle_draw_list)):
         pygame.draw.polygon(screen, BLUE, ((rectangle_draw_list[i][0], rectangle_draw_list[i][1]), (rectangle_draw_list[i][2], rectangle_draw_list[i][3]), (rectangle_draw_list[i][4], rectangle_draw_list[i][5]), (rectangle_draw_list[i][6], rectangle_draw_list[i][7])), 1) 
 
-    #pygame.draw.circle(screen, BLACK, (66,462), 2)
 
     pygame.display.flip()
 
