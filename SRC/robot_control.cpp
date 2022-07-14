@@ -38,11 +38,12 @@ int num_control_algorithm_names = 4;
 const char *control_algorithm_name[] = { 
                                         "OVERLORD", 
                                         "BASIC_AVOID_ICRA",
+					"BASIC_AVOID_ICRA_W_BAYESIAN",
 					"BOIDS",
 				        "SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE"	
                                         };
 
-enum control_algorithm_type {OVERLORD = 0, BASIC_AVOID_ICRA = 1, BOIDS = 2, SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE, NO_CONTROL};
+enum control_algorithm_type {OVERLORD = 0, BASIC_AVOID_ICRA = 1, BASIC_AVOID_ICRA_W_BAYESIAN = 2, BOIDS = 3, SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE, NO_CONTROL};
 
 /*-------------------------------------------------------------------------
  * (function: run_agent_control)
@@ -73,6 +74,9 @@ void setup_function_for_control(agent_group_t *agent_group, char *function_name)
 			break;
                 case BASIC_AVOID_ICRA:
                         agent_group->fptr_control_algorithm = control_algorithm_BASIC_AVOID_ICRA;
+			break;
+                case BASIC_AVOID_ICRA_W_BAYESIAN:
+                        agent_group->fptr_control_algorithm = control_algorithm_BASIC_AVOID_ICRA_W_BAYESIAN;
 			break;
                 case BOIDS:
                         agent_group->fptr_control_algorithm = NULL;

@@ -32,6 +32,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 /* CONTROL Algorithms */
 extern void control_algorithm_OVERLORD(agent_t *agent, double current_time);
 extern void control_algorithm_BASIC_AVOID_ICRA(agent_t *agent, double current_time);
+extern void control_algorithm_BASIC_AVOID_ICRA_W_BAYESIAN(agent_t *agent, double current_time);
 extern void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t *agent, double current_time);
 
 /* SENSORS */

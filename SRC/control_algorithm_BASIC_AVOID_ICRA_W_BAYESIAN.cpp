@@ -47,9 +47,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define TURN_TIME 9
 
 /*-------------------------------------------------------------------------
- * (function: BASIC_AVOID_ICRA_control_algorithm)
+ * (function: BASIC_AVOID_ICRA_W_BAYESIAN)
  *-----------------------------------------------------------------------*/
-void control_algorithm_BASIC_AVOID_ICRA(agent_t *agent, double current_time) 
+void control_algorithm_BASIC_AVOID_ICRA_W_BAYESIAN(agent_t *agent, double current_time) 
 {
 	void *sensor_val;
 	beam_sensor_t *sensor_data;
@@ -62,6 +62,8 @@ void control_algorithm_BASIC_AVOID_ICRA(agent_t *agent, double current_time)
 	/* read sensor two check if something is 5cm away */
 	sensor_val = run_sensor(agent->agent_group->sensors[SENSOR], agent, current_time);
 	sensor_data = (beam_sensor_t*)sensor_val;
+
+	// PROCESS W BAYESIAN HERE
 
 	//printf("sensor reads %f meters\n", sensor_data->in_m);
 

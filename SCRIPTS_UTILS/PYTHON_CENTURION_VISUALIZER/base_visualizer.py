@@ -93,12 +93,6 @@ WHITE = (255, 255, 255)
 SURFACE_COLOR = (255, 255, 255)#(167, 255, 100)
 COLOR = (255, 100, 98)
 
-#Other Variables for use in the program
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 600
-# add 10 surrounding space
-DISPLAY_EDGE = 10
-
 #Initialzing 
 pygame.init()
 
@@ -111,7 +105,6 @@ FramePerSec = pygame.time.Clock()
 
 #Setting up Sprites        
 all_sprites_list = pygame.sprite.Group()
-
 
 # Object class
 class circle_static(pygame.sprite.Sprite):
@@ -165,6 +158,7 @@ scale_factor = min(scale_factor_w, scale_factor_h)
 print("Simulation - scale_factor:"+str(scale_factor))
 
 result = soup.find('object')
+
 circles = result.find_all('circle')
 circle_list = []
 for i in range(0, len(circles)):
@@ -294,6 +288,7 @@ for i in range(0, len(time_step)):
         beam_y2 = float(hits[j].find('beam_y2').text)
         point_intersect_x = float(hits[j].find('point_intersect_x').text)
         point_intersect_y = float(hits[j].find('point_intersect_y').text)
+        distance = float(hits[j].find('distance').text)
 
         # SCALE and FLIP Y
         beam_x1 = transform_x(beam_x1, scale_factor, DISPLAY_EDGE)
@@ -304,7 +299,7 @@ for i in range(0, len(time_step)):
         point_intersect_y = transform_y(point_intersect_y, scale_factor, DISPLAY_EDGE, SCREEN_HEIGHT)
 
         # store the hit data
-        sensor_hit_list[i].append((beam_x1, beam_y1, beam_x2, beam_y2, point_intersect_x, point_intersect_y))
+        sensor_hit_list[i].append((beam_x1, beam_y1, beam_x2, beam_y2, point_intersect_x, point_intersect_y, distance))
 #print(sensor_hit_list)
 #print(agent_list)
 
@@ -315,6 +310,9 @@ clock = pygame.time.Clock()
 current_step = 0
 step_size = 0
 last_step = len(time_step) - 1
+
+# fonts
+font = pygame.font.SysFont(None, 24)
 
 while exit:
 
@@ -341,18 +339,12 @@ while exit:
             if event.key == pygame.K_n:
                 step_size = -step_size
             if event.key == pygame.K_SPACE:
-                if current_step == last_step:
-                    current_step = last_step
-                elif current_step == 0:
-                    current_step = 0
-                elif current_step + step_size < 0:
+                if current_step + step_size < 0:
                     current_step = 0
                 elif current_step + step_size > last_step:
                     current_step = last_step
                 else:
                     current_step = current_step + step_size
-                    
-                print("Current_step:"+str(current_step))
 
                 for i in range(0, len(agent_sprites)):
                     #print(str(agent_list[current_step][i][0])+':'+str(agent_list[current_step][i][1])+':'+str(agent_list[current_step][i][2]));
@@ -363,8 +355,14 @@ while exit:
     all_sprites_list.update()
     screen.fill(SURFACE_COLOR)
 
+    current_step_str = "Current_step:"+str(current_step)
+    current_step_img = font.render(current_step_str, True, pygame_COLORS.BLACK)
+    screen.blit(current_step_img, (20, 20))
+
     # draw sim box which represents real space
-    pygame.draw.polygon(screen, BLACK, ((DISPLAY_EDGE, DISPLAY_EDGE), (DISPLAY_EDGE, SCREEN_HEIGHT-DISPLAY_EDGE), (SCREEN_WIDTH-DISPLAY_EDGE, SCREEN_HEIGHT-DISPLAY_EDGE), (SCREEN_WIDTH-DISPLAY_EDGE, DISPLAY_EDGE)), 2)
+    pygame.draw.polygon(screen, BLACK, ((DISPLAY_EDGE, DISPLAY_EDGE), (DISPLAY_EDGE, SCREEN_HEIGHT-DISPLAY_EDGE), (SCREEN_WIDTH-DISPLAY_EDGE, SCREEN_HEIGHT-DISPLAY_EDGE), (SCREEN_WIDTH-DISPLAY_EDGE, DISPLAY_EDGE)), 4)
+    # draw sim actual space 
+    pygame.draw.polygon(screen, RED, ((DISPLAY_EDGE, to_pygame_y(DISPLAY_EDGE, SCREEN_HEIGHT)), (DISPLAY_EDGE, to_pygame_y(int(simulation_height*scale_factor)+DISPLAY_EDGE, SCREEN_HEIGHT)), (int(simulation_width*scale_factor)+DISPLAY_EDGE, to_pygame_y(int(simulation_height*scale_factor)+DISPLAY_EDGE, SCREEN_HEIGHT)), (int(simulation_width*scale_factor)+DISPLAY_EDGE, to_pygame_y(DISPLAY_EDGE, SCREEN_HEIGHT))), 2)
 
     # draw sprites
     all_sprites_list.draw(screen)
@@ -375,15 +373,17 @@ while exit:
         for i in range(0, len(sensor_hit_list[current_step])):
             pygame.gfxdraw.line(screen, sensor_hit_list[current_step][i][0], sensor_hit_list[current_step][i][1], sensor_hit_list[current_step][i][2], sensor_hit_list[current_step][i][3], pygame_COLORS.VIOLETRED2)
             pygame.draw.circle(screen, pygame_COLORS.VIOLETRED2, (sensor_hit_list[current_step][i][4], sensor_hit_list[current_step][i][5]), 2)
+            sensor_str = "Sense at: "+str(sensor_hit_list[current_step][i][6]) + "m"
+            img = font.render(sensor_str, True, pygame_COLORS.VIOLETRED2)
+            screen.blit(img, (20, 40))
 
     # draw RECTANGLES
     # draw static rectangles
     for i in range(0, len(rectangle_draw_list)):
         pygame.draw.polygon(screen, BLUE, ((rectangle_draw_list[i][0], rectangle_draw_list[i][1]), (rectangle_draw_list[i][2], rectangle_draw_list[i][3]), (rectangle_draw_list[i][4], rectangle_draw_list[i][5]), (rectangle_draw_list[i][6], rectangle_draw_list[i][7])), 1) 
 
-
+    # DOUBLE BUFFEREING
     pygame.display.flip()
-
 
     clock.tick(60)
 

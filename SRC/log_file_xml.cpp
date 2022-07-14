@@ -193,7 +193,7 @@ int output_log_file_xml_time_step_agent(int tabs, int agent_id, double x, double
 /*-------------------------------------------------------------------------
  * (function: output_log_file_xml_time_step_sensor_beam_hit)
  *-----------------------------------------------------------------------*/
-int output_log_file_xml_time_step_sensor_beam_hit(int tabs, line_segment_t *sensor_beam, vector_2D_t *point_intersect) 
+int output_log_file_xml_time_step_sensor_beam_hit(int tabs, line_segment_t *sensor_beam, vector_2D_t *point_intersect, double distance) 
 {
 	int num_tabs = tabs;
 
@@ -207,6 +207,8 @@ int output_log_file_xml_time_step_sensor_beam_hit(int tabs, line_segment_t *sens
 	fprintf(sim_system.Fsim_log_out, "<beam_x2>%f</beam_x2><beam_y2>%f</beam_y2>\n", sensor_beam->point2.x, sensor_beam->point2.y);
 	tabs_to_line(num_tabs);
 	fprintf(sim_system.Fsim_log_out, "<point_intersect_x>%f</point_intersect_x><point_intersect_y>%f</point_intersect_y>\n", point_intersect->x,  point_intersect->y);
+	tabs_to_line(num_tabs);
+	fprintf(sim_system.Fsim_log_out, "<distance>%f</distance>\n", distance);
 
 	num_tabs--;
 	tabs_to_line(num_tabs);

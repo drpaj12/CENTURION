@@ -109,7 +109,7 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 	circle_t *circle;
 	oriented_rectangle_t *rectangle;
 
-	printf("sensor_beam line_segemnt -> x=%f y=%f to x1=%f y=%f\n", start_point.x, start_point.y, end_point.x, end_point.y);
+	//printf("sensor_beam line_segemnt -> x=%f y=%f to x1=%f y=%f\n", start_point.x, start_point.y, end_point.x, end_point.y);
 
 	vector_2D_t point_of_intersect;
 	sim_obj_t *closest_obj = NULL;
@@ -241,7 +241,7 @@ beam_sensor_t* find_closest_object_on_beam_projection(beam_sensor_t **sensor_rea
 		sensor_reading[0]->in_m = min_distance;
 		sensor_reading[0]->angle_phi = 0.0;
 		/* output sensor hit to log file */
-		sim_system.output_log_tab_step = output_log_file_xml_time_step_sensor_beam_hit(sim_system.output_log_tab_step, &beam_segment, &point_of_intersect);
+		sim_system.output_log_tab_step = output_log_file_xml_time_step_sensor_beam_hit(sim_system.output_log_tab_step, &beam_segment, &point_of_intersect, min_distance);
 	}
 	else
 	{

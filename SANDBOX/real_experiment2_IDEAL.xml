@@ -1,0 +1,117 @@
+<centurion_config>
+	<system>
+		<simulation_type>discrete</simulation_type>
+		<rand_seed>1</rand_seed>
+		<debug_file_out>debug.out</debug_file_out>
+		<sim_log_file_out>log_file.out</sim_log_file_out>
+	</system>
+	<environment>
+		<real_size_x_in_m>1.22</real_size_x_in_m>
+		<real_size_y_in_m>0.91</real_size_y_in_m>
+		<sim_grid_size_in_m>0.01</sim_grid_size_in_m>
+		<sim_time_s>80</sim_time_s>
+		<sim_time_computation_epoch_s>0.1</sim_time_computation_epoch_s>
+		<boundary_walls>FALSE</boundary_walls>
+		<objects>
+			<num_objects>2</num_objects>
+			<object>
+				<rectangle>
+					<center_x>0.59</center_x>
+					<center_y>0.4325</center_y>
+					<halfExtend_x>0.01</halfExtend_x>
+					<halfExtend_y>0.0925</halfExtend_y>
+					<rotation>0</rotation>
+				</rectangle>
+
+			</object>
+			<object>
+				<rectangle>
+					<center_x>0.40</center_x>
+					<center_y>0.09</center_y>
+					<halfExtend_x>0.0625</halfExtend_x>
+					<halfExtend_y>0.01</halfExtend_y>
+					<rotation>0</rotation>
+				</rectangle>
+			</object>
+		</objects>
+	</environment>
+	<agents>
+		<num_agent_groups>2</num_agent_groups>
+		<agent_group>
+			<num_agents>1</num_agents>
+			<!-- control must always be included and is last item in agent group -->
+			<control>
+				<control_algorithm>OVERLORD</control_algorithm>	
+			</control>
+		</agent_group>
+		<agent_group>
+			<num_agents>1</num_agents>
+			<initialization_of_agents>
+				<!-- internal function to init -->
+				<!--<all_agents>random</all_agents>-->
+
+				<!-- list of agents.  Must have x and ys == to match num_agents_in_group above.
+				     Also, note, code is not smart and expects, <x> then <y> then <angle> ... angle MUST be last -->
+				<list>
+					<x>0.10</x><y>0.40</y><angle>0</angle>
+				</list>
+			</initialization_of_agents>
+			<!-- robots are currently spheres, x1 and y1 don't matter -->
+			<object>
+				<circle>
+					<x>0.0</x>
+					<y>0.0</y>
+					<!-- robot is 11.45cm, and therefore r = sqrt(11.45^2+11.45^2) -->
+					<radius>0.0795495</radius> 
+				</circle>
+			</object>
+			<sensors>
+				<num_sensors>1</num_sensors>
+				<sensor>
+					<type>IDEAL_BEAM</type>
+					<!--<type>ULTRASONIC</type>-->
+					<!--<type>IR</type>-->
+					<!-- assume 0 = 0 degrees facing forward -->
+					<direction_on_agent>0</direction_on_agent>
+					<!-- this (sim_time...) needs to be the last parameter -->
+					<sim_time_computation_epoch_s>0.5</sim_time_computation_epoch_s>
+				</sensor>	
+			</sensors>
+			<actuators>
+				<num_actuators>1</num_actuators>
+				<actuator>
+					<!-- <type> needs to be the last parameter -->
+					<type>IDEAL_TWO_WHEEL</type>
+					<!--<type>TWO_WHEEL</type>-->
+				</actuator>
+			</actuators>
+			<!-- control must always be included and is last item in agent group -->
+			<control>
+				<control_algorithm>BASIC_AVOID_ICRA</control_algorithm>
+				<!--<control_algorithm>BASIC_AVOID_ICRA_W_BAYESIAN</control_algorithm>-->
+				<!--<control_algorithm>SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE</control_algorithm>-->
+				<!--<control_algorithm>BOIDS</control_algorithm>-->
+				<!--<goals>
+					<waypoint><x>1.1</x><y>1.2</y></waypoint>
+					<crash>FALSE</crash>
+				</goals>-->
+			</control>
+		</agent_group>
+	</agents>
+	<atons>
+		<beacons>
+			<num_beacons>1</num_beacons>
+			<beacon>
+				<x>0.5</x>
+				<y>0.23</y>
+				<!-- assume x = 0 y = 1 is NORTH and x = 1 y = 0 is EAST -->
+				<vector>
+					<x>0</x>
+					<y>1</y>
+				</vector>
+			</beacon>
+		</beacons>
+	</atons>
+
+
+</centurion_config>

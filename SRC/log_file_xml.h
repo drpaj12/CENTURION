@@ -34,7 +34,7 @@ void output_log_file_xml_footer(int tabs) ;
 int output_log_file_xml_time_step_start(int tabs, double time) ;
 int output_log_file_xml_time_step_stop(int tabs) ;
 int output_log_file_xml_time_step_agent(int tabs, int agent_id, double x, double y, double angle) ;
-int output_log_file_xml_time_step_sensor_beam_hit(int tabs, line_segment_t *sensor_beam, vector_2D_t *point_intersect);
+int output_log_file_xml_time_step_sensor_beam_hit(int tabs, line_segment_t *sensor_beam, vector_2D_t *point_intersect, double distance);
 
 #endif
 
