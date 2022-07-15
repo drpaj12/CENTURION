@@ -242,6 +242,11 @@ for i in range(0, len(rectangles)):
     rectangle_draw_list.append((rx0, ry0, rx1, ry1, rx2, ry2, rx3, ry3))
 #print(rectangle_list)
 
+time_at = soup.find_all('time_at')
+time_list = []
+for i in range(0, len(time_at)):
+    time_list.append(float(time_at[i].text))
+
 time_step = soup.find_all('time_step')
 agent_list = []
 sensor_hit_list = []
@@ -355,7 +360,7 @@ while exit:
     all_sprites_list.update()
     screen.fill(SURFACE_COLOR)
 
-    current_step_str = "Current_step:"+str(current_step)
+    current_step_str = "Current_step:"+str(current_step)+" Time:"+str(time_list[current_step])
     current_step_img = font.render(current_step_str, True, pygame_COLORS.BLACK)
     screen.blit(current_step_img, (20, 20))
 

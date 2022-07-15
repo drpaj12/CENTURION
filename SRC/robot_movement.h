@@ -30,6 +30,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "types.h"
 
 extern void move(agent_t *agent, double distance_in_m);
+extern void move_with_drift(agent_t *agent, double distance_in_m, double angle_offset);
 extern void turn(agent_t *agent, double angle_in_rad);
 
 #endif

@@ -38,7 +38,9 @@ extern void control_algorithm_SIMPLE_MOVE_IN_SQUARE_AND_STOP_W_OBSTACLE(agent_t 
 /* SENSORS */
 extern void* sensor_function_IDEAL_BEAM(sensor_t *sensor, agent_t *agent, double current_time);
 extern void* sensor_function_ULTRASONIC(sensor_t *sensor, agent_t *agent, double current_time);
+extern void* sensor_function_ULTRASONIC_W_BAYESIAN(sensor_t *sensor, agent_t *agent, double current_time);
 extern void* sensor_function_IR(sensor_t *sensor, agent_t *agent, double current_time);
+extern void* sensor_function_IR_W_BAYESIAN(sensor_t *sensor, agent_t *agent, double current_time);
 
 /* ACTUATORS */
 extern void actuator_function_IDEAL_TWO_WHEEL(actuator_t *actuator, agent_t *agent, act_inputs_t *inputs, double current_time);
@@ -51,6 +53,7 @@ struct beam_sensor_t_t
 	double angle_phi; // angle of the object
 
 	short new_data;
+	short reads;
 };
 
 #endif

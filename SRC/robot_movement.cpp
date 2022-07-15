@@ -46,6 +46,16 @@ void move(agent_t *agent, double distance_in_m)
 }
 
 /*-------------------------------------------------------------------------
+ * (function: move_with_drift)
+ *-----------------------------------------------------------------------*/
+void move_with_drift(agent_t *agent, double distance_in_m, double angle_offset)
+{
+	agent->circle->center.x = agent->circle->center.x + cos(agent->angle+angle_offset) * distance_in_m;
+	agent->circle->center.y = agent->circle->center.y + sin(agent->angle+angle_offset) * distance_in_m;
+}
+
+
+/*-------------------------------------------------------------------------
  * (function: move_forward)
  *-----------------------------------------------------------------------*/
 void turn(agent_t *agent, double angle_in_rad)

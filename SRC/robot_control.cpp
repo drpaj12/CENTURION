@@ -34,7 +34,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "control_sensors_actuators.h"
 
 /* globals */
-int num_control_algorithm_names = 4;
+int num_control_algorithm_names = 5;
 const char *control_algorithm_name[] = { 
                                         "OVERLORD", 
                                         "BASIC_AVOID_ICRA",
@@ -64,6 +64,8 @@ void setup_function_for_control(agent_group_t *agent_group, char *function_name)
 {
 	int control_function_id;
 	
+	oassert(NO_CONTROL == num_control_algorithm_names);
+
         control_function_id = return_string_in_list(function_name, (char**)control_algorithm_name, num_control_algorithm_names);
 
         switch(control_function_id)

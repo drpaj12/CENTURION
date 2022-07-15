@@ -37,13 +37,15 @@ OTHER DEALINGS IN THE SOFTWARE.
 #include "log_file_xml.h"
 
 /* globals */
-int num_sensor_names = 3; // number of strings below and in enum
+int num_sensor_names = 5; // number of strings below and in enum
 const char *sensor_names[] = { 
                                         "IDEAL_BEAM", 
                                         "ULTRASONIC",
+                                        "ULTRASONIC_W_BAYESIAN",
                                         "IR" 
+                                        "IR_W_BAYESIAN" 
                                         };
-enum sensor_types {IDEAL_BEAM = 0, ULTRASONIC = 1 , IR = 2, NO_SENSOR};
+enum sensor_types {IDEAL_BEAM = 0, ULTRASONIC, ULTRASONIC_W_BAYESIAN, IR, IR_W_BAYESIAN, NO_SENSOR};
 
 /*-------------------------------------------------------------------------
  * (function: run_sensor)
@@ -65,6 +67,8 @@ void setup_function_for_sensor(sensor_t *sensor, char *function_name)
 {
 	int sensor_function_id;
 	
+	oassert(NO_SENSOR == num_sensor_names);
+
         sensor_function_id = return_string_in_list(function_name, (char**)sensor_names, num_sensor_names);
 
         switch(sensor_function_id)
@@ -76,8 +80,14 @@ void setup_function_for_sensor(sensor_t *sensor, char *function_name)
                 case ULTRASONIC:
                         sensor->fptr_sensor = sensor_function_ULTRASONIC;
 			break;
+                case ULTRASONIC_W_BAYESIAN:
+                        sensor->fptr_sensor = sensor_function_ULTRASONIC_W_BAYESIAN;
+			break;
                 case IR:
                         sensor->fptr_sensor = sensor_function_IR;
+			break;
+                case IR_W_BAYESIAN:
+                        sensor->fptr_sensor = sensor_function_IR_W_BAYESIAN;
 			break;
 		default:
 			printf("EXIT - Agent with no sensor algorithm\n");

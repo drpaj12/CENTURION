@@ -55,9 +55,10 @@ void control_algorithm_BASIC_AVOID_ICRA_W_BAYESIAN(agent_t *agent, double curren
 	beam_sensor_t *sensor_data;
 	int *mem_old_STATE;
 	act_inputs_t actuator_input;
+	int sensor_reads;
 
 	/* with STATE being very big - S_START is STATE 0 */
-	enum states {S_START, S_START_WARMUP, S_WARMUP, S_START_FORWARD, S_FORWARD, S_START_TURN_RIGHT, S_TURN_RIGHT};
+	enum states {S_START, S_START_WARMUP, S_WARMUP, S_START_FORWARD, S_FORWARD, S_START_TURN_RIGHT, S_TURN_RIGHT, S_WAIT_SENSOR_READS};
 
 	/* read sensor two check if something is 5cm away */
 	sensor_val = run_sensor(agent->agent_group->sensors[SENSOR], agent, current_time);
@@ -65,7 +66,7 @@ void control_algorithm_BASIC_AVOID_ICRA_W_BAYESIAN(agent_t *agent, double curren
 
 	// PROCESS W BAYESIAN HERE
 
-	//printf("sensor reads %f meters\n", sensor_data->in_m);
+	printf("sensor reads %f meters\n", sensor_data->in_m);
 
 	/* sensor reads -1 if no objects */
 	if (
@@ -131,10 +132,19 @@ void control_algorithm_BASIC_AVOID_ICRA_W_BAYESIAN(agent_t *agent, double curren
 				break;
 			case S_FORWARD: 
 				/* actuator inputs */
-				actuator_input.left = 1;
-				actuator_input.right = 1;
-				actuator_input.time_in_s = FORWARD_TIME; // s at 1cm/s = 10cm
-				actuator_input.new_instruction = TRUE;
+				if (sensor_data->reads != 4) 
+				{
+					actuator_input.left = 0;
+					actuator_input.right = 0;
+					actuator_input.new_instruction = TRUE;
+				}
+				else
+				{
+					actuator_input.left = 1;
+					actuator_input.right = 1;
+					actuator_input.time_in_s = FORWARD_TIME; // s at 1cm/s = 10cm
+					actuator_input.new_instruction = TRUE;
+				}
 
 				agent->CURRENT_STATE = S_FORWARD;
 				break;
@@ -153,6 +163,8 @@ void control_algorithm_BASIC_AVOID_ICRA_W_BAYESIAN(agent_t *agent, double curren
 				agent->time_in_state += current_time - agent->last_time;	
 
 				/* actuator inputs */
+				actuator_input.left = 0;
+				actuator_input.right = 1;
 				actuator_input.new_instruction = FALSE;
 
 				if (agent->time_in_state < TURN_TIME)

@@ -39,7 +39,7 @@ const char *actuator_names[] = {
                                         "IDEAL_TWO_WHEEL", 
                                         "TWO_WHEEL"
                                         };
-enum actuator_types {IDEAL_TWO_WHEEL = 0, TWO_WHEEL = 1,  NO_SENSOR};
+enum actuator_types {IDEAL_TWO_WHEEL = 0, TWO_WHEEL = 1,  NO_ACTUATOR};
 
 /*-------------------------------------------------------------------------
  * (function: run_actuator)
@@ -62,6 +62,8 @@ void setup_function_for_actuator(actuator_t *actuator, char *function_name)
 {
 	int actuator_function_id;
 	
+	oassert(NO_ACTUATOR == num_actuator_names);
+
         actuator_function_id = return_string_in_list(function_name, (char**)actuator_names, num_actuator_names);
 
         switch(actuator_function_id)
