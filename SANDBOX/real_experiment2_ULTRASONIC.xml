@@ -16,19 +16,19 @@
 			<num_objects>2</num_objects>
 			<object>
 				<rectangle>
-					<center_x>0.59</center_x>
-					<center_y>0.4325</center_y>
+					<center_x>0.87</center_x>
+					<center_y>0.455</center_y>
 					<halfExtend_x>0.01</halfExtend_x>
-					<halfExtend_y>0.0925</halfExtend_y>
+					<halfExtend_y>0.11</halfExtend_y>
 					<rotation>0</rotation>
 				</rectangle>
 
 			</object>
 			<object>
 				<rectangle>
-					<center_x>0.40</center_x>
-					<center_y>0.09</center_y>
-					<halfExtend_x>0.0625</halfExtend_x>
+					<center_x>0.64</center_x>
+					<center_y>0.20</center_y>
+					<halfExtend_x>0.07</halfExtend_x>
 					<halfExtend_y>0.01</halfExtend_y>
 					<rotation>0</rotation>
 				</rectangle>
@@ -53,7 +53,7 @@
 				<!-- list of agents.  Must have x and ys == to match num_agents_in_group above.
 				     Also, note, code is not smart and expects, <x> then <y> then <angle> ... angle MUST be last -->
 				<list>
-					<x>0.10</x><y>0.40</y><angle>0</angle>
+					<x>0.36</x><y>0.51</y><angle>0</angle>
 				</list>
 			</initialization_of_agents>
 			<!-- robots are currently spheres, x1 and y1 don't matter -->

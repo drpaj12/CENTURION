@@ -184,7 +184,15 @@ double sum_array_IR(double array[], int num_elements)
 	}
 	return(sum);
 }
-
+/*
+ * Function:  normalize_array
+ * --------------------
+ * normalize the given array by dividing all the elements by the sum of them
+ *
+ *  array[]: the array to be sum
+ *  num_elements: size of the given array
+ *  returns: void
+ */
 void normalize_array_IR(double array[], int num_elements)
 {
 	double sum = sum_array_IR(array, num_elements);
@@ -194,13 +202,23 @@ void normalize_array_IR(double array[], int num_elements)
 	}
 }
 
+/*
+ * Function:  make_prediction
+ * --------------------
+ * computes the probability array of finite numbers of state given a reading. The probability retains and only resets after 10 iterations or restart parameter is set to 1.
+ *
+ *  reading: the reading of the sensors (ultrasonic, IR, etc.)
+ *  restart: 1 to restart the probability array. Otherwise, default is 0
+ *  returns: the probability array of finite numbers of state
+ */
+
 double make_bayesian_prediction_IR(double *prob_array, double actual_distance, int restart) 
 {
 	int i;
 	int at_idx = 0;
 	double return_distance;
 	double find_max = -1;
-	// Variable to notify reading and 
+	// Variable to keep track of iteration
 	static int sampleCount = 0;
 	static int init = 1;
 	/* Storing finite number of state */
@@ -252,9 +270,21 @@ double make_bayesian_prediction_IR(double *prob_array, double actual_distance, i
 	}
 
 	// Generate the random numbers that follows the Gausian Distribution
-	return mean_k1 * (pow(state[at_idx], mean_k2));
+	//return mean_k1 * (pow(state[at_idx], mean_k2));
+	// Distance at state
+	
+	return state[at_idx];
 }
 
+/*
+ * Function:  randnorm
+ * --------------------
+ * generate a random number that follows a normal distribution with a given mean and standard deviation
+ *
+ *  mu: mean of the normal distribution
+ *  sigma: standard deviation of the normal distribution
+ *  returns: a single double that is taken from a normal distribution with a given mean and standard deviation
+ */
 double randnorm_IR(double mu, double sigma)
 {
 	double U1, U2, W, mult;
@@ -283,7 +313,15 @@ double randnorm_IR(double mu, double sigma)
 	return (mu + sigma * (double)X1);
 }
 
-double generate_characterized_sensor_read_IR(double distance) {
+ /* Function:  generate_data
+ * --------------------
+ * generate a random number that follows a normal distribution with a mean and standard deviation calculated based on a given distance. 
+ *
+ *  distance: distance of the object measured from the sensor
+ *  returns: a single double that is taken from a normal distribution with a calculated mean and standard deviation
+ */
+double generate_characterized_sensor_read_IR(double distance) 
+{
 	// Constant to calculate to mean and standard deviation from the given distance
 	static double mean_k1 = 11955.224610613135;
 	static double mean_k2 = -0.9738407600162202;
@@ -298,6 +336,11 @@ double generate_characterized_sensor_read_IR(double distance) {
 	return randnorm_IR(mean, std);
 }
 
+/*-------------------------------------------------------------------------
+ * (function: )
+ * Wrapper for the IR with bayesian such that the prediction is made using
+ * a version of the sensor read
+ *-----------------------------------------------------------------------*/
 double generate_characterized_sensor_read_with_bayesian_IR(double distance, double *probability_array, int num_reads) 
 {
 	return make_bayesian_prediction_IR(probability_array, generate_characterized_sensor_read_IR(distance), num_reads); 
